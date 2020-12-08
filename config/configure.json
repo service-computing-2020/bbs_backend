@@ -1,0 +1,14 @@
+{
+  "secret": "ios-final",
+  "db": {
+    "host": "193.112.201.148",
+    "port": "30007",
+    "db": "ios",
+    "username": "root",
+    "password": "baijiadong120201"
+  },
+  "redis": {
+    "host": "http://localhost",
+    "port": "6379"
+  }
+}
