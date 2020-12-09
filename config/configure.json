@@ -1,9 +1,9 @@
 {
-  "secret": "ios-final",
+  "secret": "service_computing",
   "db": {
     "host": "193.112.201.148",
     "port": "30007",
-    "db": "ios",
+    "db": "service_computing",
     "username": "root",
     "password": "baijiadong120201"
   },

@@ -13,9 +13,8 @@ func main() {
 	{
 		userRouter := api.Group("/users")
 		{
-			userRouter.POST("/register", controllers.UserRegister)
-			userRouter.POST("/login", controllers.UserLogin)
-
+			userRouter.POST("/", controllers.UserRegister)
+			userRouter.PUT("/", controllers.UserLogin)
 			userRouter.Use(middlewares.VerifyJWT())
 			userRouter.GET("/", controllers.GetAllUsers)
 		}
