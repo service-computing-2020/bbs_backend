@@ -4,6 +4,7 @@ import (
 	//"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/service-computing-2020/bbs_backend/controllers"
+	"github.com/service-computing-2020/bbs_backend/middlewares"
 	//"github.com/service-computing-2020/bbs_backend/middlewares"
 )
 
@@ -17,7 +18,7 @@ func main() {
 
 			userRouter.POST("/", controllers.UserRegister)
 			userRouter.PUT("/", controllers.UserLogin)
-			//userRouter.Use(middlewares.VerifyJWT())
+			userRouter.Use(middlewares.VerifyJWT())
 			userRouter.GET("/", controllers.GetAllUsers)
 
 			// 单个用户路由
@@ -25,6 +26,17 @@ func main() {
 			{
 				singleUserRouter.POST("/avatar", controllers.UploadAvatar)
 				singleUserRouter.GET("/avatar", controllers.GetAvatar)
+			}
+		}
+		forumRouter := api.Group("/forums")
+		{
+			forumRouter.GET("/", controllers.GetAllPublicFroums)
+			forumRouter.POST("/", middlewares.VerifyJWT(), controllers.CreateForum)
+			// 单个论坛路由
+			singleForumRouter := forumRouter.Group("/:forum_id")
+			{
+				singleForumRouter.POST("/cover", middlewares.VerifyJWT(), controllers.UploadCover)
+				singleForumRouter.GET("/cover", controllers.GetCover)
 			}
 		}
 

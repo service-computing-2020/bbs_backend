@@ -1,41 +1,60 @@
 package middlewares
 
 import (
-	"github.com/service-computing-2020/bbs_backend/service"
-	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/service-computing-2020/bbs_backend/service"
 )
 
-func VerifyJWT() gin.HandlerFunc{
+// 提取token
+func ExtractToken(r *http.Request) string {
+	// 'Authorization' : 'Bearer token'
+	strArr := strings.Split(r.Header.Get("Authorization"), " ")
+	if len(strArr) == 2 {
+		return strArr[1]
+	}
+	return ""
+}
+
+func VerifyJWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		isError := false
 		var data interface{}
-		token := c.Query("token")
+		token := ExtractToken(c.Request)
 		if token == "" {
 			isError = true
-			c.JSON(http.StatusBadRequest, gin.H {
+			c.JSON(http.StatusBadRequest, gin.H{
 				"code": 400,
-				"msg": "缺少token",
-				"data":data,
+				"msg":  "缺少token",
+				"data": data,
 			})
 		} else {
 			claims, err := service.ParseToken(token)
 			if err != nil {
 				isError = true
-				c.JSON(http.StatusInternalServerError, gin.H {
-					"code":500,
-					"msg":"token校验发生错误",
-					"data":data,
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"code": 500,
+					"msg":  "token校验发生错误",
+					"data": data,
 				})
 			} else if time.Now().Unix() > claims.ExpiresAt {
 				isError = true
 				c.JSON(http.StatusForbidden, gin.H{
-					"code":403,
-					"msg":"token已过期",
-					"data":data,
+					"code": 403,
+					"msg":  "token已过期",
+					"data": data,
 				})
+			} else {
+				// TODO:
+				// 如何优雅防止拿着自己的token，却修改别人的资料？
+				// 临时解决方案:通过context传递
+				c.Set("Claims", claims)
+				// fmt.Println("middleware.userid", claims.UserId)
 			}
+
 		}
 
 		if isError {
