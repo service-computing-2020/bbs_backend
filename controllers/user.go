@@ -1,10 +1,13 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/service-computing-2020/bbs_backend/models"
 	"github.com/service-computing-2020/bbs_backend/service"
 	"github.com/gin-gonic/gin"
+	"io"
 	"net/http"
+	"path"
 )
 
 // 用户注册需要提供的字段
@@ -58,8 +61,8 @@ func UserLogin(c *gin.Context) {
 	var param LoginParam
 	data := make(map[string]string)
 	err := c.BindJSON(&param)
-
-	if err != nil {
+	fmt.Println(param)
+	if err != nil{
 		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "参数不合法: "+err.Error(), "data":data})
 		return
 	}
@@ -122,4 +125,51 @@ func GetAllUsers(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"code":200, "msg": "获取全部用户", "data":data})
+}
+
+
+// 上传用户头像图像
+func UploadAvatar(c * gin.Context) {
+	data := make(map[string]string)
+
+	file, header, err := c.Request.FormFile("avatar")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "请求格式不正确: " + err.Error(), "data": data})
+	} else {
+		fmt.Println(c.Request.URL.String())
+		// 图片统一改成png上传
+		_, err := service.FileUpload(file, header, path.Base(c.Request.URL.Path), c.Request.URL.Path, ".png")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"code":500, "msg": "文件服务错误: " + err.Error(), "data": data})
+		} else {
+
+			c.JSON(http.StatusOK, gin.H{"code": 200, "msg": "上传头像成功", "data": data})
+		}
+	}
+}
+
+// 获取用户图片
+func GetAvatar(c *gin.Context) {
+	var data interface{}
+	rawImage, err := service.FileDownload(c.Request.URL.Path, "avatar", ".png")
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"code": 404, "msg": "获取头像失败" + err.Error(), "data": data})
+
+	} else {
+		// 图片最多2个M
+		image := make([]byte, 2000000 )
+		len, err := rawImage.Read(image)
+		if err != nil {
+			if err != io.EOF && err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "读取图片失败 " + err.Error(), "data": data})
+			} else {
+				c.Writer.WriteHeader(http.StatusOK)
+				c.Header("Content-Disposition", "attachment; filename=hello.txt")
+				c.Header("Content-Type", "image/jpeg")
+				c.Header("Accept-Length", fmt.Sprintf("%d", len))
+				c.Writer.Write(image)
+			}
+		}
+	}
+
 }
