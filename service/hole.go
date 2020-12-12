@@ -1,6 +1,33 @@
 package service
 
-// import (
-// 	"github.com/service-computing-2020/bbs_backend/models"
-// 	"log"
-// )
+import (
+	"github.com/pkg/errors"
+	"github.com/service-computing-2020/bbs_backend/models"
+)
+
+func GetAllHolesByForumID(forum_id int) ([]models.Hole, error) {
+	return models.GetAllHolesByForumID(forum_id)
+}
+
+// 根据 hole_id 获取一个hole的详情
+func GetOneHoleDetailByHoleID(hole_id int) ([]models.HoleDetail, error) {
+	var holeDetails []models.HoleDetail
+
+	holes, err := models.GetOneHoleByHoleID(hole_id)
+	if err != nil {
+		return nil, err
+	}
+	if len(holes) == 0 {
+		return nil, errors.New("该hole_id对应的hole不存在")
+	}
+	hole := holes[0]
+
+	files, err := models.GetFilesByHoleID(hole_id)
+	if err != nil {
+		return nil, err
+	}
+
+	holeDetail := models.HoleDetail{Hole: hole, Files: files}
+	holeDetails = []models.HoleDetail{holeDetail}
+	return holeDetails, nil
+}

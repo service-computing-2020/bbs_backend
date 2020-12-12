@@ -11,6 +11,11 @@ type Hole struct {
 	CreateAt string `json:"content"`
 }
 
+type HoleDetail struct {
+	Hole
+	Files []ExtendedFile
+}
+
 // 将数据库查询结果转换为 HOLE
 func convertMapToHole(hole map[string]string) Hole {
 	hole_id, _ := strconv.Atoi(hole["hole_id"])
@@ -26,8 +31,36 @@ func convertMapToHole(hole map[string]string) Hole {
 	}
 }
 
-// 创建一个匿名帖子(树洞帖子)
+// 创建一个匿名帖子（树洞帖子）
 func CreateHole(hole Hole) (int64, error) {
 	sentence := "INSERT INTO hole(forum_id, user_id, title, content) VALUES (?, ?, ?, ?)"
 	return Execute(sentence, hole.ForumID, hole.UserID, hole.Title, hole.Content)
+}
+
+// 获取某个 forum 下的全部 holes
+func GetAllHolesByForumID(forum_id int) ([]Hole, error) {
+	var ret []Hole
+	res, err := QueryRows("SELECT * FROM hole WHERE forum_id=?", forum_id)
+	if err != nil {
+		return ret, err
+	}
+
+	for _, p := range res {
+		ret = append(ret, convertMapToHole(p))
+	}
+	return ret, nil
+}
+
+// 根据id获取某个 Hole
+func GetOneHoleByHoleID(hole_id int) ([]Hole, error) {
+	var ret []Hole
+	res, err := QueryRows("SELECT * FROM hole WHERE hole_id=?", hole_id)
+	if err != nil {
+		return ret, err
+	}
+
+	for _, p := range res {
+		ret = append(ret, convertMapToHole(p))
+	}
+	return ret, nil
 }
