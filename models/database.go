@@ -64,7 +64,7 @@ func QueryRows(sentence string, args ...interface{}) ([]map[string]string, error
 	return ret, nil
 }
 
-// 插入/删除, 返回影响的行数和错误
+// 插入/删除, 返回最后插入的ID和错误
 func Execute(sentence string, args ...interface{}) (int64, error) {
 	stmt, err := DB.Prepare(sentence)
 	if err != nil {
@@ -78,7 +78,7 @@ func Execute(sentence string, args ...interface{}) (int64, error) {
 		log.Fatal(err)
 		return 0, nil
 	}
-	return rows.RowsAffected()
+	return rows.LastInsertId()
 }
 
 func init() {

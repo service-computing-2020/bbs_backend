@@ -4,6 +4,8 @@ package service
 
 import (
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
+	"github.com/service-computing-2020/bbs_backend/models"
 	"github.com/spf13/viper"
 	"time"
 )
@@ -49,4 +51,12 @@ func ParseToken(token string) (*Claims, error) {
 
 	return nil, err
 }
+
+// 从上下文中获取当前用户信息
+func GetUserFromContext(c *gin.Context) models.User {
+	claims, _ := c.MustGet("Claims").(*Claims)
+	return models.User{UserId: claims.UserId, Username: claims.Username, Password: claims.Password}
+}
+
+
 

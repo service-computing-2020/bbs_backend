@@ -11,6 +11,7 @@ import (
 func main() {
 	router := gin.Default()
 	router.Use(CORSMiddleware())
+	router.MaxMultipartMemory = 5 << 20		// 限制文件大小为5MB
 	api := router.Group("/api")
 	{
 		userRouter := api.Group("/users")
@@ -37,6 +38,13 @@ func main() {
 			{
 				singleForumRouter.POST("/cover", middlewares.VerifyJWT(), controllers.UploadCover)
 				singleForumRouter.GET("/cover", controllers.GetCover)
+
+				// post 路由
+				postRouter := singleForumRouter.Group("/posts")
+				{
+
+					postRouter.POST("/", middlewares.VerifyJWT(),controllers.CreatePost)
+				}
 			}
 		}
 

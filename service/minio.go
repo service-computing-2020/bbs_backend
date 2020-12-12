@@ -13,6 +13,11 @@ import (
 
 var MinioClient *minio.Client
 
+type File struct{
+	F multipart.File
+	H *multipart.FileHeader
+}
+
 func init() {
 	viper.SetConfigName("configure")
 	viper.SetConfigType("json")
@@ -49,12 +54,41 @@ func getDownloadName(path string, ext string) string {
 	return strings.ReplaceAll(path, "/", "-") + ext
 }
 
+// 上传多个文件，如果有文件上传出错则回滚之前的文件, 返回成功上传的文件名
+func MultipleFilesUpload(files []File, bucketName string, path string ,ext string)([]string, error) {
+
+	var names []string
+	for _, f := range files {
+		filename, err := FileUpload(f.F, f.H, bucketName, path, ext)
+		if err != nil {
+			for _, del_f := range names {
+				err := FileDelete(del_f, bucketName)
+				if err != nil {
+					panic(err.Error())
+				}
+			}
+			return nil, err
+		}
+		names = append(names, filename)
+	}
+	return names, nil
+}
 
 
-func FileUpload(file multipart.File,header *multipart.FileHeader, bucketName string, path string, ext string)(info minio.UploadInfo, err error) {
+func FileDelete(filename string, bucketName string) error{
+	ctx := context.Background()
+	return MinioClient.RemoveObject(ctx, bucketName, filename, minio.RemoveObjectOptions{})
+}
+
+func FileUpload(file multipart.File,header *multipart.FileHeader, bucketName string, path string, ext string)(filename string, err error) {
 	ctx := context.Background()
 
-	return MinioClient.PutObject(ctx, bucketName, getUploadName(path, ext), file, header.Size, minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	_, err = MinioClient.PutObject(ctx, bucketName, getUploadName(path, ext), file, header.Size, minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	if err != nil {
+		return "", err
+	} else {
+		return getUploadName(path, ext), err
+	}
 }
 
 func FileDownload(filename string, bucketName string, ext string) (*minio.Object, error) {
