@@ -6,8 +6,9 @@ import (
 	"net/http"
 	"path"
 	"strconv"
-	"github.com/pingcap/log"
+
 	"github.com/gin-gonic/gin"
+	"github.com/pingcap/log"
 	"github.com/service-computing-2020/bbs_backend/models"
 	"github.com/service-computing-2020/bbs_backend/service"
 )
@@ -20,6 +21,21 @@ type RegisterParam struct {
 }
 
 // 用户注册控制器
+// UserRegister godoc
+// @Summary UserRegister
+// @Description UserRegister
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param username body string true "用户名"
+// @Param password body string true "密码"
+// @Param email body string true "邮箱"
+// @Success 200 {object} responses.StatusOKResponse "注册成功"
+// @Failure 400 {object} responses.StatusBadRequestResponse "参数不合法"
+// @Failure 403 {object} responses.StatusForbiddenResponse "该用户名已经被使用"
+// @Failure 403 {object} responses.StatusForbiddenResponse "该邮箱已经被使用"
+// @Failure 500 {object} responses.StatusInternalServerError "服务器错误"
+// @Router /users [post]
 func UserRegister(c *gin.Context) {
 	log.Info("user register controller")
 	var param RegisterParam
@@ -61,6 +77,20 @@ type LoginParam struct {
 }
 
 // 用户登录控制器
+// UserLogin godoc
+// @Summary UserLogin
+// @Description UserLogin
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param input body string true "用户名或者邮箱"
+// @Param password body string true "密码"
+// @Success 200 {object} responses.StatusOKResponse{data=responses.Token} "正确登陆"
+// @Failure 400 {object} responses.StatusBadRequestResponse "参数不合法"
+// @Failure 403 {object} responses.StatusForbiddenResponse "密码错误"
+// @Failure 403 {object} responses.StatusForbiddenResponse "该用户名或邮箱不存在"
+// @Failure 500 {object} responses.StatusInternalServerError "服务器错误"
+// @Router /users [put]
 func UserLogin(c *gin.Context) {
 	log.Info("user login controller")
 	var param LoginParam
@@ -121,6 +151,16 @@ func UserLogin(c *gin.Context) {
 	c.JSON(http.StatusForbidden, gin.H{"code": 403, "msg": "该用户名或邮箱不存在", "data": data})
 }
 
+// GetAllUsers godoc
+// @Summary GetAllUsers
+// @Description GetAllUsers
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param token header string true "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头""
+// @Success 200 {object} responses.StatusOKResponse{data=[]models.User} "获取全部用户"
+// @Failure 500 {object} responses.StatusInternalServerError "服务器错误"
+// @Router /users [get]
 func GetAllUsers(c *gin.Context) {
 	log.Info("get all users controller")
 	data, err := models.GetAllUsers()
@@ -133,6 +173,19 @@ func GetAllUsers(c *gin.Context) {
 }
 
 // 上传用户头像图像
+// UploadAvatar godoc
+// @Summary UploadAvatar
+// @Description UploadAvatar
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param avatar formData file true "用户头像"
+// @Param token header string true "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头""
+// @Success 200 {object} responses.StatusOKResponse "上传头像成功"
+// @Failure 400 {object} responses.StatusBadRequestResponse "请求格式不正确"
+// @Failure 403 {object} responses.StatusForbiddenResponse "禁止更改他人资源"
+// @Failure 500 {object} responses.StatusInternalServerError "文件服务错误"
+// @Router /users/{user_id}/avatar [post]
 func UploadAvatar(c *gin.Context) {
 	log.Info("upload user avatar controller")
 	data := make(map[string]string)
@@ -161,6 +214,19 @@ func UploadAvatar(c *gin.Context) {
 }
 
 // 获取用户图片
+// GetAvatar godoc
+// @Summary GetAvatar
+// @Description GetAvatar
+// @Tags Users
+// @Accept  json
+// @Produce  image/jpeg
+// @Success 200 {object} responses.StatusOKResponse{data=[]byte} "读取头像成功，data为字节数足"
+// @Failure 404 {object} responses.StatusForbiddenResponse "获取头像失败，下载时出错"
+// @Failure 500 {object} responses.StatusInternalServerError "读取图片失败，处理时出错"
+// @Header 200 {string} Content-Disposition "attachment; filename=hello.txt"
+// @Header 200 {string} Content-Type "image/jpeg"
+// @Header 200 {string} Accept-Length "image's length"
+// @Router /users/{user_id}/avatar [get]
 func GetAvatar(c *gin.Context) {
 	log.Info("get user's avatar controller")
 	var data interface{}
