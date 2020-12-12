@@ -1,25 +1,27 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"path"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pingcap/log"
 	"github.com/service-computing-2020/bbs_backend/models"
 	"github.com/service-computing-2020/bbs_backend/service"
 )
 
 // 用户创建 POST
+
 func CreatePost(c *gin.Context) {
+	log.Info("user create post")
 	var data interface{}
 	forum_id, _ := strconv.Atoi(c.Param("forum_id"))
 	form, _ := c.MultipartForm()
 	files := form.File["files[]"]
 	title, content := c.PostForm("title"), c.PostForm("content")
 	user_id := service.GetUserFromContext(c).UserId
-
-
 
 	if title == "" || content == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg":"标题或者内容不得为空" , "data": data})
@@ -50,9 +52,29 @@ func CreatePost(c *gin.Context) {
 
 	for _, name := range names {
 		_, err := models.CreateFile(models.ExtendedFile{PostID: int(post_id), Bucket: bucketName, FileName: name})
-		panic(err)
+		if err != nil {
+		    c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "数据库插入异常 "+err.Error(), "data": data})
+		    return
+		}
 	}
-
 	c.JSON(http.StatusOK, gin.H{"code": 200, "msg": "创建 post 成功", "data": data})
 	return
+}
+
+// 获取某个 forum 下的所有post
+func GetAllPostsByForumID(c *gin.Context) {
+	log.Info("get all posts by forum_id controller")
+	forum_id, _ := strconv.Atoi(c.Param("forum_id"))
+
+	data, err := service.GetAllPostsByForumID(forum_id)
+	if err != nil {
+	    c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "查询数据库出现异常" + err.Error(), "data": nil})
+	    return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": 200,
+		"msg": fmt.Sprintf("获取论坛 %d 下的全部帖子成功", forum_id),
+		"data": data,
+	})
 }

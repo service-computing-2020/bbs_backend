@@ -27,6 +27,6 @@ func convertMapToExtendedFile(extendedFile map[string]string) ExtendedFile {
 
 // 创建文件记录
 func CreateFile(file ExtendedFile)(int64, error) {
-	sentence := "INSERT INTO file(post_id, filename, bucket) VALUES(?, ?)"
+	sentence := "INSERT INTO file(post_id, filename, bucket) VALUES(?, ?, ?)"
 	return Execute(sentence,file.PostID, file.FileName, file.Bucket)
 }

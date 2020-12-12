@@ -1,6 +1,8 @@
 package models
 
-import "strconv"
+import (
+	"strconv"
+)
 
 type Forum struct {
 	ForumID     int    `json:"forum_id"`
@@ -9,6 +11,13 @@ type Forum struct {
 	Description string `json:"description"`
 	CreateAt    string `json:"create_at"`
 	Cover       string `json:"cover"`
+}
+
+// 包含 forum 信息的用户
+type ForumUser struct {
+	User
+	Role    string `json:"role"`
+	ForumID int    `json:"forum_id"`
 }
 
 // 将数据库查询结果转换为Forum
@@ -25,6 +34,15 @@ func convertMapToForum(forum map[string]string) Forum {
 		Description: forum["description"],
 		CreateAt:    forum["create_at"],
 		Cover:       forum["cover"],
+	}
+}
+
+func convertMapToForumUser(forumUser map[string]string) ForumUser {
+	forum_id, _ := strconv.Atoi(forumUser["forum_id"])
+	return ForumUser{
+		ForumID: forum_id,
+		Role:    forumUser["role"],
+		User:    convertMapToUser(forumUser),
 	}
 }
 
@@ -64,6 +82,44 @@ func GetAllPublicForums() ([]Forum, error) {
 	}
 
 	return ret, nil
+}
+
+// 根据论坛的 ID 获取论坛信息
+func GetForumByID(forum_id int) ([]Forum, error) {
+	var ret []Forum
+
+	res, err := QueryRows("SELECT * FROM forum WHERE forum_id=?", forum_id)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, r := range res {
+		ret = append(ret, convertMapToForum(r))
+	}
+
+	return ret, nil
+}
+
+// 根据论坛id获取其成员信息/关注者信息
+func GetForumUserByForumID(forum_id int) ([]ForumUser, error) {
+	var users []ForumUser
+
+	sentence :=
+		`
+SELECT user.user_id, user.username, user.email, user.is_admin, user.create_at, user.avatar, forum_user.role
+			FROM user INNER JOIN forum_user
+            ON user.user_id = forum_user.user_id
+			WHERE forum_user.forum_id = ?;
+		`
+	res, err := QueryRows(sentence, forum_id)
+	if err != nil {
+		return nil, err
+	}
+	for _, u := range res {
+		users = append(users, convertMapToForumUser(u))
+	}
+
+	return users, nil
 }
 
 // 根据用户id获取公开及其相关论坛

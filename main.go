@@ -41,9 +41,10 @@ func main() {
 
 				// post 路由
 				postRouter := singleForumRouter.Group("/posts")
+				postRouter.Use(middlewares.VerifyJWT(), middlewares.CanUserWatchTheForum())
 				{
-
-					postRouter.POST("/", middlewares.VerifyJWT(),controllers.CreatePost)
+					postRouter.POST("/", controllers.CreatePost)
+					postRouter.GET("/", controllers.GetAllPostsByForumID)
 				}
 			}
 		}

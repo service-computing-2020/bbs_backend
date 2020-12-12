@@ -35,3 +35,17 @@ func CreatePost(post Post) (int64, error) {
 	return Execute(sentence, post.ForumID, post.UserID, post.Title, post.Content)
 }
 
+// 获取某个 forum 下的全部 posts
+func GetAllPostsByForumID(forum_id int) ([]Post, error) {
+	var ret []Post
+	res, err := QueryRows("SELECT * FROM post WHERE forum_id=?", forum_id)
+	if err != nil {
+		return ret, err
+	}
+
+	for _, p := range res {
+		ret = append(ret, convertMapToPost(p))
+	}
+	return ret, nil
+}
+
