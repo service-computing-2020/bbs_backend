@@ -56,6 +56,7 @@ func CreatePost(c *gin.Context) {
 		    c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "数据库插入异常 "+err.Error(), "data": data})
 		    return
 		}
+		fmt.Println(name)
 	}
 	c.JSON(http.StatusOK, gin.H{"code": 200, "msg": "创建 post 成功", "data": data})
 	return
@@ -75,6 +76,23 @@ func GetAllPostsByForumID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code": 200,
 		"msg": fmt.Sprintf("获取论坛 %d 下的全部帖子成功", forum_id),
+		"data": data,
+	})
+}
+
+// 根据 id 获取某个post的详情
+func GetOnePostDetailByPostID(c *gin.Context) {
+	log.Info("get one post detail by post_id")
+	post_id, _ := strconv.Atoi(c.Param("post_id"))
+
+	data, err := service.GetOnePostDetailByPostID(post_id)
+	if err != nil {
+	    c.JSON(http.StatusBadRequest, gin.H{"code": 403, "msg": "数据库查询异常，或者该post不存在："+err.Error(), "data": nil})
+	    return
+	}
+	c.JSON(http.StatusOK,gin.H{
+		"code": 200,
+		"msg": fmt.Sprintf("获取第 %d 号帖子成功", post_id),
 		"data": data,
 	})
 }

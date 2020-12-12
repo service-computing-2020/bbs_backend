@@ -30,3 +30,22 @@ func CreateFile(file ExtendedFile)(int64, error) {
 	sentence := "INSERT INTO file(post_id, filename, bucket) VALUES(?, ?, ?)"
 	return Execute(sentence,file.PostID, file.FileName, file.Bucket)
 }
+
+// 根据 post_id 获取其相关的 files
+func GetFilesByPostID(post_id int)([]ExtendedFile, error) {
+	var files []ExtendedFile
+
+	sentence :=
+		`SELECT * FROM file WHERE post_id = ?`
+	res, err := QueryRows(sentence, post_id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, r := range res {
+		files = append(files, convertMapToExtendedFile(r))
+	}
+
+	return files, nil
+}

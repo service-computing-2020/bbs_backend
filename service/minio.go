@@ -59,7 +59,7 @@ func MultipleFilesUpload(files []File, bucketName string, path string ,ext strin
 
 	var names []string
 	for idx, f := range files {
-		new_path := fmt.Sprintf("%s-%d", path, idx)
+		new_path := fmt.Sprintf("%s%d", path, idx)
 		filename, err := FileUpload(f.F, f.H, bucketName, new_path, ext)
 		if err != nil {
 			for _, del_f := range names {

@@ -12,6 +12,11 @@ type Post struct {
 	Like	int	`json:"like"`
 }
 
+type PostDetail struct {
+	Post
+	Files []ExtendedFile
+}
+
 // 将数据库查询结果转换为 POST
 func convertMapToPost(post map[string]string) Post {
 	post_id, _ := strconv.Atoi(post["post_id"])
@@ -28,6 +33,7 @@ func convertMapToPost(post map[string]string) Post {
 		Like: like,
 	}
 }
+
 
 // 创建一个帖子
 func CreatePost(post Post) (int64, error) {
@@ -49,3 +55,16 @@ func GetAllPostsByForumID(forum_id int) ([]Post, error) {
 	return ret, nil
 }
 
+// 根据id获取某个 Post
+func GetOnePostByPostID(post_id int) ([]Post, error) {
+	var ret []Post
+	res, err := QueryRows("SELECT * FROM post WHERE post_id=?", post_id)
+	if err != nil {
+		return ret, err
+	}
+
+	for _, p := range res {
+		ret = append(ret, convertMapToPost(p))
+	}
+	return ret, nil
+}
