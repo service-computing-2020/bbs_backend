@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"path"
 	"strconv"
-
+	"github.com/pingcap/log"
 	"github.com/gin-gonic/gin"
 	"github.com/service-computing-2020/bbs_backend/models"
 	"github.com/service-computing-2020/bbs_backend/service"
@@ -21,6 +21,7 @@ type RegisterParam struct {
 
 // 用户注册控制器
 func UserRegister(c *gin.Context) {
+	log.Info("user register controller")
 	var param RegisterParam
 	err := c.BindJSON(&param)
 	if err != nil {
@@ -61,6 +62,7 @@ type LoginParam struct {
 
 // 用户登录控制器
 func UserLogin(c *gin.Context) {
+	log.Info("user login controller")
 	var param LoginParam
 	data := make(map[string]string)
 	err := c.BindJSON(&param)
@@ -120,7 +122,7 @@ func UserLogin(c *gin.Context) {
 }
 
 func GetAllUsers(c *gin.Context) {
-
+	log.Info("get all users controller")
 	data, err := models.GetAllUsers()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "服务器错误: " + err.Error(), "data": data})
@@ -132,6 +134,7 @@ func GetAllUsers(c *gin.Context) {
 
 // 上传用户头像图像
 func UploadAvatar(c *gin.Context) {
+	log.Info("upload user avatar controller")
 	data := make(map[string]string)
 	// 获取token的claim
 	claims, _ := c.MustGet("Claims").(*service.Claims)
@@ -159,6 +162,7 @@ func UploadAvatar(c *gin.Context) {
 
 // 获取用户图片
 func GetAvatar(c *gin.Context) {
+	log.Info("get user's avatar controller")
 	var data interface{}
 	rawImage, err := service.FileDownload(c.Request.URL.Path, "avatar", ".png")
 	if err != nil {

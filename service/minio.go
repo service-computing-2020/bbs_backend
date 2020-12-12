@@ -58,8 +58,9 @@ func getDownloadName(path string, ext string) string {
 func MultipleFilesUpload(files []File, bucketName string, path string ,ext string)([]string, error) {
 
 	var names []string
-	for _, f := range files {
-		filename, err := FileUpload(f.F, f.H, bucketName, path, ext)
+	for idx, f := range files {
+		new_path := fmt.Sprintf("%s%d", path, idx)
+		filename, err := FileUpload(f.F, f.H, bucketName, new_path, ext)
 		if err != nil {
 			for _, del_f := range names {
 				err := FileDelete(del_f, bucketName)

@@ -17,10 +17,10 @@ func main() {
 		userRouter := api.Group("/users")
 		{
 
-			userRouter.POST("/", controllers.UserRegister)
-			userRouter.PUT("/", controllers.UserLogin)
+			userRouter.POST("", controllers.UserRegister)
+			userRouter.PUT("", controllers.UserLogin)
 			userRouter.Use(middlewares.VerifyJWT())
-			userRouter.GET("/", controllers.GetAllUsers)
+			userRouter.GET("", controllers.GetAllUsers)
 
 			// 单个用户路由
 			singleUserRouter := userRouter.Group("/:user_id")
@@ -31,8 +31,8 @@ func main() {
 		}
 		forumRouter := api.Group("/forums")
 		{
-			forumRouter.GET("/", controllers.GetAllPublicFroums)
-			forumRouter.POST("/", middlewares.VerifyJWT(), controllers.CreateForum)
+			forumRouter.GET("", controllers.GetAllPublicFroums)
+			forumRouter.POST("", middlewares.VerifyJWT(), controllers.CreateForum)
 			// 单个论坛路由
 			singleForumRouter := forumRouter.Group("/:forum_id")
 			{
@@ -41,14 +41,20 @@ func main() {
 
 				// post 路由
 				postRouter := singleForumRouter.Group("/posts")
+				postRouter.Use(middlewares.VerifyJWT(), middlewares.CanUserWatchTheForum())
 				{
-					postRouter.POST("/", middlewares.VerifyJWT(), controllers.CreatePost)
-				}
+					postRouter.POST("", controllers.CreatePost)
+					postRouter.GET("", controllers.GetAllPostsByForumID)
 
-				// hole 路由
-				holeRouter := singleForumRouter.Group("/holes")
-				{
-					holeRouter.POST("/", middlewares.VerifyJWT(), controllers.CreateHole)
+					singlePostRouter := postRouter.Group("/:post_id")
+					{
+						singlePostRouter.GET("", controllers.GetOnePostDetailByPostID)
+
+						fileRouter := singlePostRouter.Group("/files")
+						{
+							fileRouter.GET("", controllers.GetFilesByPostID)
+						}
+					}
 				}
 			}
 		}

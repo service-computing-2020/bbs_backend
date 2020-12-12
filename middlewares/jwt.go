@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pingcap/log"
 	"github.com/service-computing-2020/bbs_backend/service"
 )
 
@@ -21,6 +22,7 @@ func ExtractToken(r *http.Request) string {
 
 func VerifyJWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		log.Info("verify jwt middleware")
 		isError := false
 		var data interface{}
 		token := ExtractToken(c.Request)
