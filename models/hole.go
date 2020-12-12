@@ -8,12 +8,12 @@ type Hole struct {
 	UserID   int    `json:"user_id"`
 	Title    string `json:"title"`
 	Content  string `json:"content"`
-	CreateAt string `json:"content"`
+	CreateAt string `json:"create_at"`
 }
 
 type HoleDetail struct {
 	Hole
-	Files []ExtendedFile
+	//Files []ExtendedFile
 }
 
 // 将数据库查询结果转换为 HOLE

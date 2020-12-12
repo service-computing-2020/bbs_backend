@@ -22,12 +22,7 @@ func GetOneHoleDetailByHoleID(hole_id int) ([]models.HoleDetail, error) {
 	}
 	hole := holes[0]
 
-	files, err := models.GetFilesByHoleID(hole_id)
-	if err != nil {
-		return nil, err
-	}
-
-	holeDetail := models.HoleDetail{Hole: hole, Files: files}
+	holeDetail := models.HoleDetail{Hole: hole}
 	holeDetails = []models.HoleDetail{holeDetail}
 	return holeDetails, nil
 }

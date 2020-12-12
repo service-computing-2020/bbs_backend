@@ -48,23 +48,3 @@ func GetFilesByPostID(post_id int) ([]ExtendedFile, error) {
 
 	return files, nil
 }
-
-// 根据 hole_id 获取其相关的 files
-// 待补充，file表无hole_id的，此处用post_id
-func GetFilesByHoleID(hole_id int) ([]ExtendedFile, error) {
-	var files []ExtendedFile
-
-	sentence :=
-		`SELECT * FROM file WHERE post_id = ?`
-	res, err := QueryRows(sentence, hole_id)
-
-	if err != nil {
-		return nil, err
-	}
-
-	for _, r := range res {
-		files = append(files, convertMapToExtendedFile(r))
-	}
-
-	return files, nil
-}
