@@ -24,6 +24,169 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/forums": {
+            "get": {
+                "description": "GetAllPublicFroums",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Forums"
+                ],
+                "summary": "GetAllPublicFroums",
+                "responses": {
+                    "200": {
+                        "description": "获取全部公开论坛",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/responses.StatusOKResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Forum"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "服务器错误",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusInternalServerError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "CreateForum",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Forums"
+                ],
+                "summary": "CreateForum",
+                "parameters": [
+                    {
+                        "description": "论坛名",
+                        "name": "forum_name",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "是否公开",
+                        "name": "is_public",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "description": "论坛描述",
+                        "name": "description",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "论坛创建成功",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "参数不合法",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器错误",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusInternalServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/forums/{forum_id}/cover": {
+            "post": {
+                "description": "UploadCover",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Forums"
+                ],
+                "summary": "UploadCover",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "论坛封面",
+                        "name": "cover",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "上传封面成功",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求格式不正确",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusBadRequestResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "禁止更改他人资源",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusForbiddenResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "文件服务错误",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusInternalServerError"
+                        }
+                    }
+                }
+            }
+        },
         "/forums/{forum_id}/holes": {
             "get": {
                 "description": "GetAllHolesByForumID",
@@ -466,6 +629,236 @@ var doc = `{
                 }
             }
         },
+        "/forums/{forum_id}/role": {
+            "post": {
+                "description": "SubscribeForum",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "SubscribeForum",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "订阅成功",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusOKResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "不可重复订阅",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusForbiddenResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器错误",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusInternalServerError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "UnSubscribeForum",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "UnSubscribeForum",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "取消订阅成功",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusOKResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器错误",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusInternalServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/forums/{forum_id}/role/{user_id}": {
+            "get": {
+                "description": "GetRoleInForum",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "GetRoleInForum",
+                "responses": {
+                    "200": {
+                        "description": "获取角色成功",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "该用户不再此论坛下",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器错误",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusInternalServerError"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "UpdateRoleInForum",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "UpdateRoleInForum",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "目标用户的身份",
+                        "name": "role",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "授予管理员成功",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求格式不正确",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusBadRequestResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "操作者身份权限不足",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusForbiddenResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/forums/{froum_id}/cover": {
+            "get": {
+                "description": "GetCover",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "image/jpeg"
+                ],
+                "tags": [
+                    "Forums"
+                ],
+                "summary": "GetCover",
+                "responses": {
+                    "200": {
+                        "description": "读取封面成功，data为字节数组",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/responses.StatusOKResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "headers": {
+                            "Accept-Length": {
+                                "type": "string",
+                                "description": "image's length"
+                            },
+                            "Content-Disposition": {
+                                "type": "string",
+                                "description": "attachment; filename=hello.txt"
+                            },
+                            "Content-Type": {
+                                "type": "string",
+                                "description": "image/jpeg"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "获取封面失败，下载时出错",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusForbiddenResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "读取图片失败，处理时出错",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusInternalServerError"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "description": "GetAllUsers",
@@ -837,6 +1230,29 @@ var doc = `{
                 },
                 "postID": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.Forum": {
+            "type": "object",
+            "properties": {
+                "cover": {
+                    "type": "string"
+                },
+                "create_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "forum_id": {
+                    "type": "integer"
+                },
+                "forum_name": {
+                    "type": "string"
+                },
+                "is_public": {
+                    "type": "boolean"
                 }
             }
         },

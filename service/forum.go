@@ -5,7 +5,7 @@ import (
 )
 
 // 创建论坛
-func CreateForum(forumName, description string, isPublic bool) error {
+func CreateForum(forumName, description string, isPublic bool) (int64, error) {
 	forum := models.Forum{
 		ForumName:   forumName,
 		IsPublic:    isPublic,
@@ -14,10 +14,9 @@ func CreateForum(forumName, description string, isPublic bool) error {
 	return models.CreateForum(forum)
 }
 
-
 // 查找当前用户是否是论坛成员
 // 如果该论坛是公开的，则直接返回true, 否则查看论坛的成员列表中是否有该用户
-func IsUserInForum(user_id int, forum_id int) (bool, error){
+func IsUserInForum(user_id int, forum_id int) (bool, error) {
 	forums, err := models.GetForumByID(forum_id)
 
 	if err != nil {

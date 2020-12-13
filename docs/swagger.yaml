@@ -12,6 +12,21 @@ definitions:
       postID:
         type: integer
     type: object
+  models.Forum:
+    properties:
+      cover:
+        type: string
+      create_at:
+        type: string
+      description:
+        type: string
+      forum_id:
+        type: integer
+      forum_name:
+        type: string
+      is_public:
+        type: boolean
+    type: object
   models.Hole:
     properties:
       content:
@@ -156,6 +171,111 @@ definitions:
 info:
   contact: {}
 paths:
+  /forums:
+    get:
+      consumes:
+      - application/json
+      description: GetAllPublicFroums
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取全部公开论坛
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.StatusOKResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Forum'
+                  type: array
+              type: object
+        "500":
+          description: 服务器错误
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: GetAllPublicFroums
+      tags:
+      - Forums
+    post:
+      consumes:
+      - application/json
+      description: CreateForum
+      parameters:
+      - description: 论坛名
+        in: body
+        name: forum_name
+        required: true
+        schema:
+          type: string
+      - description: 是否公开
+        in: body
+        name: is_public
+        required: true
+        schema:
+          type: boolean
+      - description: 论坛描述
+        in: body
+        name: description
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 论坛创建成功
+          schema:
+            $ref: '#/definitions/responses.StatusOKResponse'
+        "400":
+          description: 参数不合法
+          schema:
+            $ref: '#/definitions/responses.StatusBadRequestResponse'
+        "500":
+          description: 服务器错误
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: CreateForum
+      tags:
+      - Forums
+  /forums/{forum_id}/cover:
+    post:
+      consumes:
+      - application/json
+      description: UploadCover
+      parameters:
+      - description: 论坛封面
+        in: formData
+        name: cover
+        required: true
+        type: file
+      - description: 将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 上传封面成功
+          schema:
+            $ref: '#/definitions/responses.StatusOKResponse'
+        "400":
+          description: 请求格式不正确
+          schema:
+            $ref: '#/definitions/responses.StatusBadRequestResponse'
+        "403":
+          description: 禁止更改他人资源
+          schema:
+            $ref: '#/definitions/responses.StatusForbiddenResponse'
+        "500":
+          description: 文件服务错误
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: UploadCover
+      tags:
+      - Forums
   /forums/{forum_id}/holes:
     get:
       consumes:
@@ -433,6 +553,156 @@ paths:
       summary: GetOneFile
       tags:
       - Files
+  /forums/{forum_id}/role:
+    delete:
+      consumes:
+      - application/json
+      description: UnSubscribeForum
+      parameters:
+      - description: 将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 取消订阅成功
+          schema:
+            $ref: '#/definitions/responses.StatusOKResponse'
+        "500":
+          description: 服务器错误
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: UnSubscribeForum
+      tags:
+      - Role
+    post:
+      consumes:
+      - application/json
+      description: SubscribeForum
+      parameters:
+      - description: 将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 订阅成功
+          schema:
+            $ref: '#/definitions/responses.StatusOKResponse'
+        "403":
+          description: 不可重复订阅
+          schema:
+            $ref: '#/definitions/responses.StatusForbiddenResponse'
+        "500":
+          description: 服务器错误
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: SubscribeForum
+      tags:
+      - Role
+  /forums/{forum_id}/role/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: GetRoleInForum
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取角色成功
+          schema:
+            $ref: '#/definitions/responses.StatusOKResponse'
+        "400":
+          description: 该用户不再此论坛下
+          schema:
+            $ref: '#/definitions/responses.StatusBadRequestResponse'
+        "500":
+          description: 服务器错误
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: GetRoleInForum
+      tags:
+      - Role
+    patch:
+      consumes:
+      - application/json
+      description: UpdateRoleInForum
+      parameters:
+      - description: 将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头
+        in: header
+        name: token
+        required: true
+        type: string
+      - description: 目标用户的身份
+        in: body
+        name: role
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 授予管理员成功
+          schema:
+            $ref: '#/definitions/responses.StatusOKResponse'
+        "400":
+          description: 请求格式不正确
+          schema:
+            $ref: '#/definitions/responses.StatusBadRequestResponse'
+        "403":
+          description: 操作者身份权限不足
+          schema:
+            $ref: '#/definitions/responses.StatusForbiddenResponse'
+      summary: UpdateRoleInForum
+      tags:
+      - Role
+  /forums/{froum_id}/cover:
+    get:
+      consumes:
+      - application/json
+      description: GetCover
+      produces:
+      - image/jpeg
+      responses:
+        "200":
+          description: 读取封面成功，data为字节数组
+          headers:
+            Accept-Length:
+              description: image's length
+              type: string
+            Content-Disposition:
+              description: attachment; filename=hello.txt
+              type: string
+            Content-Type:
+              description: image/jpeg
+              type: string
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.StatusOKResponse'
+            - properties:
+                data:
+                  items:
+                    type: integer
+                  type: array
+              type: object
+        "404":
+          description: 获取封面失败，下载时出错
+          schema:
+            $ref: '#/definitions/responses.StatusForbiddenResponse'
+        "500":
+          description: 读取图片失败，处理时出错
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: GetCover
+      tags:
+      - Forums
   /users:
     get:
       consumes:

@@ -2,10 +2,11 @@ package main
 
 import (
 	//"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/service-computing-2020/bbs_backend/controllers"
 	"github.com/service-computing-2020/bbs_backend/middlewares"
-	"github.com/gin-contrib/cors"
+
 	//"github.com/service-computing-2020/bbs_backend/middlewares"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -78,6 +79,15 @@ func main() {
 					{
 						singleHoleRouter.GET("", controllers.GetOneHoleDetailByHoleID)
 					}
+				}
+
+				// role 路由
+				roleRouter := singleForumRouter.Group("/role")
+				{
+					roleRouter.POST("", middlewares.VerifyJWT(), controllers.SubscribeForum)
+					roleRouter.DELETE("", middlewares.VerifyJWT(), controllers.UnSubscribeForum)
+					roleRouter.GET("/:user_id", controllers.GetRoleInForum)
+					roleRouter.PATCH("/:user_id", middlewares.VerifyJWT(), controllers.UpdateRoleInForum)
 				}
 			}
 		}

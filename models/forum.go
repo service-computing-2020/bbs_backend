@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"strconv"
 )
 
@@ -47,10 +48,13 @@ func convertMapToForumUser(forumUser map[string]string) ForumUser {
 }
 
 // 创建论坛
-func CreateForum(forum Forum) error {
+func CreateForum(forum Forum) (int64, error) {
 	sentence := "INSERT INTO forum(forum_name, is_public, description, cover) VALUES(?, ?, ?, ?)"
-	_, err := Execute(sentence, forum.ForumName, forum.IsPublic, forum.Description, forum.Cover)
-	return err
+	id, err := Execute(sentence, forum.ForumName, forum.IsPublic, forum.Description, forum.Cover)
+	if err != nil {
+		return -1, err
+	}
+	return id, nil
 }
 
 // 往论坛写入封面的url
@@ -82,6 +86,41 @@ func GetAllPublicForums() ([]Forum, error) {
 	}
 
 	return ret, nil
+}
+
+// 将某用户"添加为"某论坛的"user/owner/admin"
+func AddRoleInForum(forum_id, user_id int, role string) error {
+	sentence := "INSERT INTO forum_user(forum_id, user_id, role) VALUES(?, ?, ?)"
+	_, err := Execute(sentence, forum_id, user_id, role)
+	return err
+}
+
+// 查找某用户在某论坛中的角色
+func FindRoleInForum(forum_id, user_id int) (string, error) {
+	res, err := QueryRows("SELECT role FROM forum_user WHERE forum_id=? AND user_id=?", forum_id, user_id)
+	if err != nil {
+		return "", err
+	}
+	if len(res) == 0 {
+		return "", errors.New("此用户不在该论坛下")
+	}
+	role := res[0]["role"]
+	// fmt.Println("role is", role)
+	return role, nil
+}
+
+// 将某用户在某论坛的角色修改为role
+func UpdateRoleInForum(forum_id, user_id int, role string) error {
+	sentence := "UPDATE forum_user SET role=? WHERE forum_id=? AND user_id=?"
+	_, err := Execute(sentence, role, forum_id, user_id)
+	return err
+}
+
+// 将某用户在论坛中删除
+func DeleteRoleInForum(forum_id, user_id int) error {
+	sentence := "DELETE FROM forum_user WHERE forum_id=? AND user_id=?"
+	_, err := Execute(sentence, forum_id, user_id)
+	return err
 }
 
 // 根据论坛的 ID 获取论坛信息
