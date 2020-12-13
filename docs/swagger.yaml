@@ -1,4 +1,58 @@
 definitions:
+<<<<<<< HEAD
+=======
+  models.ExtendedFile:
+    properties:
+      bucket:
+        type: string
+      create_at:
+        type: string
+      file_id:
+        type: integer
+      filename:
+        type: string
+      postID:
+        type: integer
+    type: object
+  models.Post:
+    properties:
+      content:
+        type: string
+      create_at:
+        type: string
+      forum_id:
+        type: integer
+      like:
+        type: integer
+      post_id:
+        type: integer
+      title:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.PostDetail:
+    properties:
+      content:
+        type: string
+      create_at:
+        type: string
+      files:
+        items:
+          $ref: '#/definitions/models.ExtendedFile'
+        type: array
+      forum_id:
+        type: integer
+      like:
+        type: integer
+      post_id:
+        type: integer
+      title:
+        type: string
+      user_id:
+        type: integer
+    type: object
+>>>>>>> master
   models.User:
     properties:
       avatar:
@@ -64,6 +118,184 @@ definitions:
 info:
   contact: {}
 paths:
+<<<<<<< HEAD
+=======
+  /forums/{forum_id}/posts:
+    get:
+      consumes:
+      - application/json
+      description: GetAllPostsByForumID
+      parameters:
+      - description: 将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.StatusOKResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Post'
+                  type: array
+              type: object
+        "500":
+          description: 服务器错误
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: GetAllPostsByForumID
+      tags:
+      - Posts
+    post:
+      consumes:
+      - multipart/form-data
+      description: CreatePost
+      parameters:
+      - description: 将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头
+        in: header
+        name: token
+        required: true
+        type: string
+      - description: Post 的标题
+        in: formData
+        name: title
+        required: true
+        type: string
+      - description: Post 的内容
+        in: formData
+        name: content
+        required: true
+        type: string
+      - description: 文件内容
+        in: formData
+        name: files[]
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建 Post 乘客
+          schema:
+            $ref: '#/definitions/responses.StatusOKResponse'
+        "403":
+          description: 您所上传的文件无法打开
+          schema:
+            $ref: '#/definitions/responses.StatusBadRequestResponse'
+        "500":
+          description: 服务器错误
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: CreatePost
+      tags:
+      - Posts
+  /forums/{forum_id}/posts/{post_id}:
+    get:
+      consumes:
+      - application/json
+      description: GetOnePostDetailByPostID
+      parameters:
+      - description: 将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.StatusOKResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.PostDetail'
+                  type: array
+              type: object
+        "400":
+          description: 数据库查询异常，或者该post不存在
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: GetOnePostDetailByPostID
+      tags:
+      - Posts
+  /forums/{forum_id}/posts/{post_id}/files:
+    get:
+      consumes:
+      - application/json
+      description: GetFilesByPostID
+      parameters:
+      - description: 将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.StatusOKResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.ExtendedFile'
+                  type: array
+              type: object
+        "500":
+          description: 服务器错误
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: GetFilesByPostID
+      tags:
+      - Files
+  /forums/{forum_id}/posts/{post_id}/files/{filename}:
+    get:
+      consumes:
+      - application/json
+      description: GetOneFile
+      produces:
+      - image/jpeg
+      responses:
+        "200":
+          description: 读取文件成功
+          headers:
+            Accept-Length:
+              description: image's length
+              type: string
+            Content-Disposition:
+              description: attachment; filename=hello.txt
+              type: string
+            Content-Type:
+              description: image/jpeg
+              type: string
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.StatusOKResponse'
+            - properties:
+                data:
+                  items:
+                    type: integer
+                  type: array
+              type: object
+        "404":
+          description: 参数不能为空
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: GetOneFile
+      tags:
+      - Files
+>>>>>>> master
   /users:
     get:
       consumes:

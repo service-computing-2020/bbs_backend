@@ -61,6 +61,7 @@ func main() {
 						fileRouter := singlePostRouter.Group("/files")
 						{
 							fileRouter.GET("", controllers.GetFilesByPostID)
+							fileRouter.GET("/:filename", controllers.GetOneFile)
 						}
 					}
 				}

@@ -235,8 +235,8 @@ func GetAvatar(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"code": 404, "msg": "获取头像失败" + err.Error(), "data": data})
 
 	} else {
-		// 图片最多2个M
-		image := make([]byte, 2000000)
+		// 图片最多5个M
+		image := make([]byte, 5000000)
 		len, err := rawImage.Read(image)
 		if err != nil {
 			if err != io.EOF && err != nil {
