@@ -1,6 +1,4 @@
 definitions:
-<<<<<<< HEAD
-=======
   models.ExtendedFile:
     properties:
       bucket:
@@ -12,6 +10,36 @@ definitions:
       filename:
         type: string
       postID:
+        type: integer
+    type: object
+  models.Hole:
+    properties:
+      content:
+        type: string
+      create_at:
+        type: string
+      forum_id:
+        type: integer
+      hole_id:
+        type: integer
+      title:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.HoleDetail:
+    properties:
+      content:
+        type: string
+      create_at:
+        type: string
+      forum_id:
+        type: integer
+      hole_id:
+        type: integer
+      title:
+        type: string
+      user_id:
         type: integer
     type: object
   models.Post:
@@ -52,7 +80,6 @@ definitions:
       user_id:
         type: integer
     type: object
->>>>>>> master
   models.User:
     properties:
       avatar:
@@ -118,8 +145,108 @@ definitions:
 info:
   contact: {}
 paths:
-<<<<<<< HEAD
-=======
+  /forums/{forum_id}/holes:
+    get:
+      consumes:
+      - application/json
+      description: GetAllHolesByForumID
+      parameters:
+      - description: 将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取树洞帖子成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.StatusOKResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Hole'
+                  type: array
+              type: object
+        "500":
+          description: 查询数据库出现异常
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: GetAllHolesByForumID
+      tags:
+      - Holes
+    post:
+      consumes:
+      - multipart/form-data
+      description: CreateHole
+      parameters:
+      - description: 将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头
+        in: header
+        name: token
+        required: true
+        type: string
+      - description: Hole 的标题
+        in: formData
+        name: title
+        required: true
+        type: string
+      - description: Hole 的内容
+        in: formData
+        name: content
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建 hole 成功
+          schema:
+            $ref: '#/definitions/responses.StatusOKResponse'
+        "400":
+          description: 树洞的标题或者内容不得为空
+          schema:
+            $ref: '#/definitions/responses.StatusBadRequestResponse'
+        "500":
+          description: 插入用户创建的hole失败
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: CreateHole
+      tags:
+      - Holes
+  /forums/{forum_id}/holes/{hole_id}:
+    get:
+      consumes:
+      - application/json
+      description: GetOneHoleDetailByHoleID
+      parameters:
+      - description: 将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取树洞帖子成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.StatusOKResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.HoleDetail'
+                  type: array
+              type: object
+        "400":
+          description: 数据库查询异常，或者该hole不存在
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: GetOneHoleDetailByHoleID
+      tags:
+      - Holes
   /forums/{forum_id}/posts:
     get:
       consumes:
@@ -181,7 +308,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: 创建 Post 乘客
+          description: 创建 Post 成功
           schema:
             $ref: '#/definitions/responses.StatusOKResponse'
         "403":
@@ -295,7 +422,6 @@ paths:
       summary: GetOneFile
       tags:
       - Files
->>>>>>> master
   /users:
     get:
       consumes:

@@ -24,8 +24,168 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-<<<<<<< HEAD
-=======
+        "/forums/{forum_id}/holes": {
+            "get": {
+                "description": "GetAllHolesByForumID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Holes"
+                ],
+                "summary": "GetAllHolesByForumID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "获取树洞帖子成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/responses.StatusOKResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Hole"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "查询数据库出现异常",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusInternalServerError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "CreateHole",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Holes"
+                ],
+                "summary": "CreateHole",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Hole 的标题",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Hole 的内容",
+                        "name": "content",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "创建 hole 成功",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "树洞的标题或者内容不得为空",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "插入用户创建的hole失败",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusInternalServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/forums/{forum_id}/holes/{hole_id}": {
+            "get": {
+                "description": "GetOneHoleDetailByHoleID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Holes"
+                ],
+                "summary": "GetOneHoleDetailByHoleID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "获取树洞帖子成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/responses.StatusOKResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.HoleDetail"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "数据库查询异常，或者该hole不存在",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusInternalServerError"
+                        }
+                    }
+                }
+            }
+        },
         "/forums/{forum_id}/posts": {
             "get": {
                 "description": "GetAllPostsByForumID",
@@ -122,7 +282,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "创建 Post 乘客",
+                        "description": "创建 Post 成功",
                         "schema": {
                             "$ref": "#/definitions/responses.StatusOKResponse"
                         }
@@ -306,7 +466,6 @@ var doc = `{
                 }
             }
         },
->>>>>>> master
         "/users": {
             "get": {
                 "description": "GetAllUsers",
@@ -620,8 +779,6 @@ var doc = `{
         }
     },
     "definitions": {
-<<<<<<< HEAD
-=======
         "models.ExtendedFile": {
             "type": "object",
             "properties": {
@@ -638,6 +795,52 @@ var doc = `{
                     "type": "string"
                 },
                 "postID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Hole": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "create_at": {
+                    "type": "string"
+                },
+                "forum_id": {
+                    "type": "integer"
+                },
+                "hole_id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.HoleDetail": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "create_at": {
+                    "type": "string"
+                },
+                "forum_id": {
+                    "type": "integer"
+                },
+                "hole_id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "integer"
                 }
             }
@@ -700,7 +903,6 @@ var doc = `{
                 }
             }
         },
->>>>>>> master
         "models.User": {
             "type": "object",
             "properties": {

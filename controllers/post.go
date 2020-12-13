@@ -23,7 +23,7 @@ import (
 // @Param title formData string true "Post 的标题"
 // @Param content formData string true "Post 的内容"
 // @Param files[] formData file true "文件内容"
-// @Success 200 {object} responses.StatusOKResponse "创建 Post 乘客"
+// @Success 200 {object} responses.StatusOKResponse "创建 Post 成功"
 // @Failure 403 {object} responses.StatusBadRequestResponse "标题或者内容不得为空"
 // @Failure 403 {object} responses.StatusBadRequestResponse "您所上传的文件无法打开"
 // @Failure 500 {object} responses.StatusInternalServerError "服务器错误"
@@ -38,7 +38,7 @@ func CreatePost(c *gin.Context) {
 	user_id := service.GetUserFromContext(c).UserId
 
 	if title == "" || content == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg":"标题或者内容不得为空" , "data": data})
+		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "标题或者内容不得为空", "data": data})
 		return
 	}
 
@@ -46,29 +46,29 @@ func CreatePost(c *gin.Context) {
 	for _, fileHeader := range files {
 		f, err := fileHeader.Open()
 		if err != nil {
-		    c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "您所上传的文件无法打开", "data": data})
-		    return
+			c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "您所上传的文件无法打开", "data": data})
+			return
 		}
 		filesToBeUpload = append(filesToBeUpload, service.File{F: f, H: fileHeader})
 	}
 	bucketName := path.Base(c.Request.URL.Path)
-	names, err := service.MultipleFilesUpload(filesToBeUpload, bucketName ,c.Request.URL.Path, ".png" )
+	names, err := service.MultipleFilesUpload(filesToBeUpload, bucketName, c.Request.URL.Path, ".png")
 	if err != nil {
-	    c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "上传文件失败，服务器内部错误" + err.Error(), "data": data})
-	    return
+		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "上传文件失败，服务器内部错误" + err.Error(), "data": data})
+		return
 	}
 	// 首先插入 post, 获取post_id
 	post_id, err := models.CreatePost(models.Post{ForumID: forum_id, UserID: user_id, Title: title, Content: content})
 	if err != nil {
-	    c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "插入用户创建的post失败", "data": data})
-	    return
+		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "插入用户创建的post失败", "data": data})
+		return
 	}
 
 	for _, name := range names {
 		_, err := models.CreateFile(models.ExtendedFile{PostID: int(post_id), Bucket: bucketName, FileName: name})
 		if err != nil {
-		    c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "数据库插入异常 "+err.Error(), "data": data})
-		    return
+			c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "数据库插入异常 " + err.Error(), "data": data})
+			return
 		}
 		fmt.Println(name)
 	}
@@ -93,13 +93,13 @@ func GetAllPostsByForumID(c *gin.Context) {
 
 	data, err := service.GetAllPostsByForumID(forum_id)
 	if err != nil {
-	    c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "查询数据库出现异常" + err.Error(), "data": nil})
-	    return
+		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "查询数据库出现异常" + err.Error(), "data": nil})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"code": 200,
-		"msg": fmt.Sprintf("获取论坛 %d 下的全部帖子成功", forum_id),
+		"msg":  fmt.Sprintf("获取论坛 %d 下的全部帖子成功", forum_id),
 		"data": data,
 	})
 }
@@ -121,12 +121,12 @@ func GetOnePostDetailByPostID(c *gin.Context) {
 
 	data, err := service.GetOnePostDetailByPostID(post_id)
 	if err != nil {
-	    c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "数据库查询异常，或者该post不存在："+err.Error(), "data": nil})
-	    return
+		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "数据库查询异常，或者该post不存在：" + err.Error(), "data": nil})
+		return
 	}
-	c.JSON(http.StatusOK,gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"code": 200,
-		"msg": fmt.Sprintf("获取第 %d 号帖子成功", post_id),
+		"msg":  fmt.Sprintf("获取第 %d 号帖子成功", post_id),
 		"data": data,
 	})
 }
