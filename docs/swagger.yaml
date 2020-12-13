@@ -80,6 +80,17 @@ definitions:
       user_id:
         type: integer
     type: object
+  models.SubscribeList:
+    properties:
+      participate_list:
+        items:
+          type: integer
+        type: array
+      star_list:
+        items:
+          type: integer
+        type: array
+    type: object
   models.User:
     properties:
       avatar:
@@ -618,6 +629,30 @@ paths:
           schema:
             $ref: '#/definitions/responses.StatusInternalServerError'
       summary: UploadAvatar
+      tags:
+      - Users
+  /users/{user_id}/subscribe:
+    get:
+      consumes:
+      - application/json
+      description: GetOneUserSubscribe
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取第{user_id}号用户的关注订阅列表成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.StatusOKResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.SubscribeList'
+              type: object
+        "500":
+          description: 数据库查询出错
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: GetOneUserSubscribe
       tags:
       - Users
 swagger: "2.0"

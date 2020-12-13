@@ -250,5 +250,27 @@ func GetAvatar(c *gin.Context) {
 			}
 		}
 	}
+}
 
+// 获取用户的关注订阅列表
+// GetOneUserSubscribe godoc
+// @Summary GetOneUserSubscribe
+// @Description	GetOneUserSubscribe
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Success 200 {object} responses.StatusOKResponse{data=models.SubscribeList} "获取第{user_id}号用户的关注订阅列表成功"
+// @Failure 500 {object} responses.StatusInternalServerError "数据库查询出错"
+// @Router /users/{user_id}/subscribe [get]
+func GetOneUserSubscribe(c *gin.Context) {
+	log.Info("get one user's subscribe controller")
+	user_id, _ := strconv.Atoi(c.Param("user_id"))
+
+	subscribe, err := service.GetOneUserSubscribe(user_id)
+	if err != nil {
+	    c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "数据库查询出错", "data": nil})
+	    return
+	}
+	c.JSON(http.StatusOK, gin.H{"code": 200, "msg": fmt.Sprintf("获取第 %d 号用户的关注订阅列表成功", user_id), "data": subscribe})
+	return
 }

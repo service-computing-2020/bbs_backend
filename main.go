@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/service-computing-2020/bbs_backend/controllers"
 	"github.com/service-computing-2020/bbs_backend/middlewares"
-
+	"github.com/gin-contrib/cors"
 	//"github.com/service-computing-2020/bbs_backend/middlewares"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -15,7 +15,7 @@ import (
 
 func main() {
 	router := gin.Default()
-	router.Use(CORSMiddleware())
+	router.Use(cors.Default())
 	// api文档自动生成
 	url := ginSwagger.URL("http://localhost:5000/swagger/doc.json") // The url pointing to API definition
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
@@ -35,6 +35,7 @@ func main() {
 			{
 				singleUserRouter.POST("/avatar", controllers.UploadAvatar)
 				singleUserRouter.GET("/avatar", controllers.GetAvatar)
+				singleUserRouter.GET("/subscribe", controllers.GetOneUserSubscribe)
 			}
 		}
 		forumRouter := api.Group("/forums")

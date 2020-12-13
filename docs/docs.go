@@ -776,6 +776,47 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/users/{user_id}/subscribe": {
+            "get": {
+                "description": "GetOneUserSubscribe",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "GetOneUserSubscribe",
+                "responses": {
+                    "200": {
+                        "description": "获取第{user_id}号用户的关注订阅列表成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/responses.StatusOKResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.SubscribeList"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "数据库查询出错",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusInternalServerError"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -900,6 +941,23 @@ var doc = `{
                 },
                 "user_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.SubscribeList": {
+            "type": "object",
+            "properties": {
+                "participate_list": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "star_list": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },

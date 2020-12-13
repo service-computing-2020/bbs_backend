@@ -83,3 +83,7 @@ func ProduceTokenByEmailAndPassword(email string, password string) (string, erro
 	}
 	return token, nil
 }
+
+func GetOneUserSubscribe(userID int) (models.SubscribeList, error) {
+	return models.GetOneUserSubscribe(userID)
+}

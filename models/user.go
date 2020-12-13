@@ -16,6 +16,16 @@ type User struct {
 
 }
 
+type SubscribeList struct {
+	ParticipateList []int	`json:"participate_list"`
+	FocusList		[]int	`json:"star_list"`
+}
+
+type UserDetail struct {
+	User
+	SubscribeList
+}
+
 // 将数据库查询的结果转换为 User
 func convertMapToUser(user map[string]string) User {
 	user_id, _ := strconv.Atoi(user["user_id"])
@@ -97,6 +107,33 @@ func GetAllUsers() ([]User, error) {
 	}
 
 	return ret, err
+}
+
+// 根据用户id获取某个用户信息以及所参与的/关注的列表
+func GetOneUserSubscribe(userID int) (SubscribeList, error) {
+	var ret SubscribeList
+	sql :=
+		`
+		SELECT forum.is_public, forum.forum_id FROM forum
+			INNER JOIN forum_user ON forum.forum_id = forum_user.forum_id
+			WHERE forum_user.user_id = ?
+		`
+	res, err := QueryRows(sql, userID)
+	if err != nil {
+		return ret, err
+	}
+
+	for _, val := range res {
+		is_public, _ := strconv.Atoi(val["is_public"])
+		forum_id, _ := strconv.Atoi(val["forum_id"])
+		if is_public == 1 {
+			ret.FocusList = append(ret.FocusList, forum_id)
+		} else {
+			ret.ParticipateList = append(ret.ParticipateList, forum_id)
+		}
+
+	}
+	return ret, nil
 }
 
 
