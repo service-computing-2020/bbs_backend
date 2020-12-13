@@ -21,7 +21,7 @@ func CreateHole(c *gin.Context) {
 	user_id := service.GetUserFromContext(c).UserId
 
 	if title == "" || content == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "标题或者内容不得为空", "data": data})
+		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "树洞的标题或者内容不得为空", "data": data})
 		return
 	}
 
