@@ -13,7 +13,21 @@ import (
 )
 
 // 用户创建 POST
-
+// CreatePost godoc
+// @Summary CreatePost
+// @Description	CreatePost
+// @Tags Posts
+// @Accept	mpfd
+// @Produce	json
+// @Param token header string true "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头""
+// @Param title formData string true "Post 的标题"
+// @Param content formData string true "Post 的内容"
+// @Param files[] formData file true "文件内容"
+// @Success 200 {object} responses.StatusOKResponse "创建 Post 乘客"
+// @Failure 403 {object} responses.StatusBadRequestResponse "标题或者内容不得为空"
+// @Failure 403 {object} responses.StatusBadRequestResponse "您所上传的文件无法打开"
+// @Failure 500 {object} responses.StatusInternalServerError "服务器错误"
+// @Router /forums/{forum_id}/posts [post]
 func CreatePost(c *gin.Context) {
 	log.Info("user create post")
 	var data interface{}
@@ -32,7 +46,7 @@ func CreatePost(c *gin.Context) {
 	for _, fileHeader := range files {
 		f, err := fileHeader.Open()
 		if err != nil {
-		    c.JSON(http.StatusBadRequest, gin.H{"code": 403, "msg": "您所上传的文件无法打开", "data": data})
+		    c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "您所上传的文件无法打开", "data": data})
 		    return
 		}
 		filesToBeUpload = append(filesToBeUpload, service.File{F: f, H: fileHeader})
@@ -63,6 +77,16 @@ func CreatePost(c *gin.Context) {
 }
 
 // 获取某个 forum 下的所有post
+// GetAllPostsByForumID godoc
+// @Summary GetAllPostsByForumID
+// @Description GetAllPostsByForumID
+// @Tags Posts
+// @Accept json
+// @Produce json
+// @Param token header string true "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头""
+// @Success 200 {object} responses.StatusOKResponse{data=[]models.Post}
+// @Failure 500 {object} responses.StatusInternalServerError "服务器错误"
+// @Router /forums/{forum_id}/posts [get]
 func GetAllPostsByForumID(c *gin.Context) {
 	log.Info("get all posts by forum_id controller")
 	forum_id, _ := strconv.Atoi(c.Param("forum_id"))
@@ -81,13 +105,23 @@ func GetAllPostsByForumID(c *gin.Context) {
 }
 
 // 根据 id 获取某个post的详情
+// GetOnePostDetailByPostID godoc
+// @Summary GetOnePostDetailByPostID
+// @Description GetOnePostDetailByPostID
+// @Tags Posts
+// @Accept json
+// @Produce json
+// @Param token header string true "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头""
+// @Success 200 {object} responses.StatusOKResponse{data=[]models.PostDetail}
+// @Failure 400 {object} responses.StatusInternalServerError "数据库查询异常，或者该post不存在"
+// @Router /forums/{forum_id}/posts/{post_id} [get]
 func GetOnePostDetailByPostID(c *gin.Context) {
 	log.Info("get one post detail by post_id")
 	post_id, _ := strconv.Atoi(c.Param("post_id"))
 
 	data, err := service.GetOnePostDetailByPostID(post_id)
 	if err != nil {
-	    c.JSON(http.StatusBadRequest, gin.H{"code": 403, "msg": "数据库查询异常，或者该post不存在："+err.Error(), "data": nil})
+	    c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "数据库查询异常，或者该post不存在："+err.Error(), "data": nil})
 	    return
 	}
 	c.JSON(http.StatusOK,gin.H{
