@@ -64,6 +64,19 @@ func main() {
 						}
 					}
 				}
+
+				// hole 路由
+				holeRouter := singleForumRouter.Group("/holes")
+				holeRouter.Use(middlewares.VerifyJWT(), middlewares.CanUserWatchTheForum())
+				{
+					holeRouter.POST("", controllers.CreateHole)
+					holeRouter.GET("", controllers.GetAllHolesByForumID)
+
+					singleHoleRouter := holeRouter.Group("/:hole_id")
+					{
+						singleHoleRouter.GET("", controllers.GetOneHoleDetailByHoleID)
+					}
+				}
 			}
 		}
 
