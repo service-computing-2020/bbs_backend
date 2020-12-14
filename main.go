@@ -2,7 +2,6 @@ package main
 
 import (
 	//"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/service-computing-2020/bbs_backend/controllers"
 	"github.com/service-computing-2020/bbs_backend/middlewares"
@@ -16,7 +15,7 @@ import (
 
 func main() {
 	router := gin.Default()
-	router.Use(cors.Default())
+	router.Use(CORSMiddleware())
 	// api文档自动生成
 	url := ginSwagger.URL("http://localhost:5000/swagger/doc.json") // The url pointing to API definition
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))

@@ -33,6 +33,7 @@ func convertMapToUser(user map[string]string) User {
 	if user["is_admin"] == "1" {
 		is_admin = true
 	}
+
 	return User{UserId: user_id, Username: user["username"], Email: user["email"],Password: user["password"], IsAdmin: is_admin, Avatar: user["avatar"], CreateAt: user["create_at"]}
 }
 
