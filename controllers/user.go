@@ -76,6 +76,12 @@ type LoginParam struct {
 	Password string `json:"password"`
 }
 
+// 登录成功返回的结果
+type LoginResponse struct {
+	Token	string `json:"token"`
+	UserId	string `json:"user_id"`
+}
+
 // 用户登录控制器
 // UserLogin godoc
 // @Summary UserLogin
@@ -85,7 +91,7 @@ type LoginParam struct {
 // @Produce  json
 // @Param input body string true "用户名或者邮箱"
 // @Param password body string true "密码"
-// @Success 200 {object} responses.StatusOKResponse{data=responses.Token} "正确登陆"
+// @Success 200 {object} responses.StatusOKResponse{data=LoginResponse} "正确登陆"
 // @Failure 400 {object} responses.StatusBadRequestResponse "参数不合法"
 // @Failure 403 {object} responses.StatusForbiddenResponse "密码错误"
 // @Failure 403 {object} responses.StatusForbiddenResponse "该用户名或邮箱不存在"
@@ -96,7 +102,6 @@ func UserLogin(c *gin.Context) {
 	var param LoginParam
 	data := make(map[string]string)
 	err := c.BindJSON(&param)
-	fmt.Println(param)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "参数不合法: " + err.Error(), "data": data})
 		return
@@ -116,7 +121,8 @@ func UserLogin(c *gin.Context) {
 				c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "服务器错误: " + err.Error(), "data": data})
 				return
 			}
-
+			userinfo, _ := service.ParseToken(data["token"])
+			data["user_id"] = strconv.Itoa(userinfo.UserId)
 			c.JSON(http.StatusOK, gin.H{"code": 200, "msg": "登录成功", "data": data})
 			return
 		} else {
@@ -136,10 +142,13 @@ func UserLogin(c *gin.Context) {
 		}
 		if pass {
 			data["token"], err = service.ProduceTokenByEmailAndPassword(param.Input, param.Password)
+
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "服务器错误: " + err.Error(), "data": data})
 				return
 			}
+			userinfo, _ := service.ParseToken(data["token"])
+			data["user_id"] = strconv.Itoa(userinfo.UserId)
 			c.JSON(http.StatusOK, gin.H{"code": 200, "msg": "登录成功", "data": data})
 			return
 		} else {

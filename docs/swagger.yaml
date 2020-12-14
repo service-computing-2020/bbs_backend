@@ -1,4 +1,11 @@
 definitions:
+  controllers.LoginResponse:
+    properties:
+      token:
+        type: string
+      user_id:
+        type: string
+    type: object
   models.ExtendedFile:
     properties:
       bucket:
@@ -11,21 +18,6 @@ definitions:
         type: string
       postID:
         type: integer
-    type: object
-  models.Forum:
-    properties:
-      cover:
-        type: string
-      create_at:
-        type: string
-      description:
-        type: string
-      forum_id:
-        type: integer
-      forum_name:
-        type: string
-      is_public:
-        type: boolean
     type: object
   models.Hole:
     properties:
@@ -163,40 +155,10 @@ definitions:
       msg:
         type: string
     type: object
-  responses.Token:
-    properties:
-      token:
-        type: string
-    type: object
 info:
   contact: {}
 paths:
   /forums:
-    get:
-      consumes:
-      - application/json
-      description: GetAllPublicFroums
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 获取全部公开论坛
-          schema:
-            allOf:
-            - $ref: '#/definitions/responses.StatusOKResponse'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/models.Forum'
-                  type: array
-              type: object
-        "500":
-          description: 服务器错误
-          schema:
-            $ref: '#/definitions/responses.StatusInternalServerError'
-      summary: GetAllPublicFroums
-      tags:
-      - Forums
     post:
       consumes:
       - application/json
@@ -807,7 +769,7 @@ paths:
             - $ref: '#/definitions/responses.StatusOKResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/responses.Token'
+                  $ref: '#/definitions/controllers.LoginResponse'
               type: object
         "400":
           description: 参数不合法

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/pkg/errors"
 	"github.com/service-computing-2020/bbs_backend/models"
 	"log"
 )
@@ -86,4 +87,25 @@ func ProduceTokenByEmailAndPassword(email string, password string) (string, erro
 
 func GetOneUserSubscribe(userID int) (models.SubscribeList, error) {
 	return models.GetOneUserSubscribe(userID)
+}
+
+func GetOneUserDetail(userID int) (models.UserDetail, error) {
+	var userDetail models.UserDetail
+	user, err := models.GetUserById(userID)
+	if err != nil {
+		return userDetail, err
+	}
+
+	if len(user) == 0 {
+		return userDetail, errors.New("该用户不存在")
+	}
+	subscribe, err := models.GetOneUserSubscribe(userID)
+	if err != nil {
+		return userDetail, err
+	}
+
+	userDetail.User = user[0]
+	userDetail.SubscribeList = subscribe
+
+	return userDetail, nil
 }

@@ -25,48 +25,6 @@ var doc = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/forums": {
-            "get": {
-                "description": "GetAllPublicFroums",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Forums"
-                ],
-                "summary": "GetAllPublicFroums",
-                "responses": {
-                    "200": {
-                        "description": "获取全部公开论坛",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/responses.StatusOKResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/models.Forum"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "服务器错误",
-                        "schema": {
-                            "$ref": "#/definitions/responses.StatusInternalServerError"
-                        }
-                    }
-                }
-            },
             "post": {
                 "description": "CreateForum",
                 "consumes": [
@@ -955,7 +913,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/responses.Token"
+                                            "$ref": "#/definitions/controllers.LoginResponse"
                                         }
                                     }
                                 }
@@ -1213,6 +1171,17 @@ var doc = `{
         }
     },
     "definitions": {
+        "controllers.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
         "models.ExtendedFile": {
             "type": "object",
             "properties": {
@@ -1230,29 +1199,6 @@ var doc = `{
                 },
                 "postID": {
                     "type": "integer"
-                }
-            }
-        },
-        "models.Forum": {
-            "type": "object",
-            "properties": {
-                "cover": {
-                    "type": "string"
-                },
-                "create_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "forum_id": {
-                    "type": "integer"
-                },
-                "forum_name": {
-                    "type": "string"
-                },
-                "is_public": {
-                    "type": "boolean"
                 }
             }
         },
@@ -1459,14 +1405,6 @@ var doc = `{
                     "type": "object"
                 },
                 "msg": {
-                    "type": "string"
-                }
-            }
-        },
-        "responses.Token": {
-            "type": "object",
-            "properties": {
-                "token": {
                     "type": "string"
                 }
             }

@@ -41,7 +41,7 @@ func main() {
 		}
 		forumRouter := api.Group("/forums")
 		{
-			forumRouter.GET("", controllers.GetAllPublicFroums)
+			forumRouter.GET("", middlewares.VerifyJWT(),controllers.GetAllPublicFroums)
 			forumRouter.POST("", middlewares.VerifyJWT(), controllers.CreateForum)
 			// 单个论坛路由
 			singleForumRouter := forumRouter.Group("/:forum_id")

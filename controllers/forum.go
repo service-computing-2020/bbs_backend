@@ -20,16 +20,33 @@ import (
 // @Tags Forums
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} responses.StatusOKResponse{data=[]models.Forum} "获取全部公开论坛"
+// @Success 200 {object} responses.StatusOKResponse{data=ForumResponse} "获取全部公开论坛"
 // @Failure 500 {object} responses.StatusInternalServerError "服务器错误"
 // @Router /forums [get]
+
+type ForumResponse struct {
+	Forums	[]models.Forum			`json:"forums"`
+	UserDetail models.UserDetail	`json:"user_detail"`
+}
 func GetAllPublicFroums(c *gin.Context) {
 	log.Info("get all public forims controller")
-	data, err := models.GetAllPublicForums()
+	var data ForumResponse
+
+	forums, err := models.GetAllPublicForums()
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "服务器错误: " + err.Error(), "data": data})
 		return
 	}
+	user:= service.GetUserFromContext(c)
+	userDetail, err := service.GetOneUserDetail(user.UserId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "查询用户信息错误: " + err.Error(), "data": data})
+		return
+	}
+
+	data.UserDetail = userDetail
+	data.Forums = forums
 	c.JSON(http.StatusOK, gin.H{"code": 200, "msg": "获取全部公开论坛", "data": data})
 }
 
