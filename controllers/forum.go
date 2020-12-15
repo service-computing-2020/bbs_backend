@@ -14,6 +14,11 @@ import (
 	"github.com/service-computing-2020/bbs_backend/models"
 )
 
+type ForumResponse struct {
+	Forums     []models.Forum    `json:"forums"`
+	UserDetail models.UserDetail `json:"user_detail"`
+}
+
 // GetAllPublicFroums godoc
 // @Summary GetAllPublicFroums
 // @Description GetAllPublicFroums
@@ -23,11 +28,6 @@ import (
 // @Success 200 {object} responses.StatusOKResponse{data=ForumResponse} "获取全部公开论坛"
 // @Failure 500 {object} responses.StatusInternalServerError "服务器错误"
 // @Router /forums [get]
-
-type ForumResponse struct {
-	Forums	[]models.Forum			`json:"forums"`
-	UserDetail models.UserDetail	`json:"user_detail"`
-}
 func GetAllPublicFroums(c *gin.Context) {
 	log.Info("get all public forims controller")
 	var data ForumResponse
@@ -38,7 +38,7 @@ func GetAllPublicFroums(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "服务器错误: " + err.Error(), "data": data})
 		return
 	}
-	user:= service.GetUserFromContext(c)
+	user := service.GetUserFromContext(c)
 	userDetail, err := service.GetOneUserDetail(user.UserId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "查询用户信息错误: " + err.Error(), "data": data})
@@ -48,6 +48,37 @@ func GetAllPublicFroums(c *gin.Context) {
 	data.UserDetail = userDetail
 	data.Forums = forums
 	c.JSON(http.StatusOK, gin.H{"code": 200, "msg": "获取全部公开论坛", "data": data})
+}
+
+// GetForumByID godoc
+// @Summary GetForumByID
+// @Description GetForumByID
+// @Tags Forums
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} responses.StatusOKResponse{data=ForumResponse} "获取全部公开论坛"
+// @Failure 500 {object} responses.StatusInternalServerError "服务器错误"
+// @Router /forums/{forum_id} [get]
+func GetForumByID(c *gin.Context) {
+	log.Info("get forum by id controller")
+	var data ForumResponse
+	forum_id, _ := strconv.Atoi(c.Param("forum_id"))
+	forums, err := models.GetForumByID(forum_id)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "服务器错误: " + err.Error(), "data": data})
+		return
+	}
+	user := service.GetUserFromContext(c)
+	userDetail, err := service.GetOneUserDetail(user.UserId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "查询用户信息错误: " + err.Error(), "data": data})
+		return
+	}
+
+	data.UserDetail = userDetail
+	data.Forums = forums
+	c.JSON(http.StatusOK, gin.H{"code": 200, "msg": "获取论坛成功", "data": data})
 }
 
 // 论坛参数

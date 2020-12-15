@@ -1,4 +1,13 @@
 definitions:
+  controllers.ForumResponse:
+    properties:
+      forums:
+        items:
+          $ref: '#/definitions/models.Forum'
+        type: array
+      user_detail:
+        $ref: '#/definitions/models.UserDetail'
+    type: object
   controllers.LoginResponse:
     properties:
       token:
@@ -43,6 +52,29 @@ definitions:
       filename:
         type: string
       postID:
+        type: integer
+    type: object
+  models.Forum:
+    properties:
+      admin_list:
+        items:
+          type: integer
+        type: array
+      cover:
+        type: string
+      create_at:
+        type: string
+      description:
+        type: string
+      forum_id:
+        type: integer
+      forum_name:
+        type: string
+      is_public:
+        type: boolean
+      post_num:
+        type: integer
+      subscribe_num:
         type: integer
     type: object
   models.Hole:
@@ -141,6 +173,31 @@ definitions:
       username:
         type: string
     type: object
+  models.UserDetail:
+    properties:
+      avatar:
+        type: string
+      create_at:
+        type: string
+      email:
+        type: string
+      is_admin:
+        type: boolean
+      participate_list:
+        items:
+          type: integer
+        type: array
+      password:
+        type: string
+      star_list:
+        items:
+          type: integer
+        type: array
+      user_id:
+        type: integer
+      username:
+        type: string
+    type: object
   responses.StatusBadRequestResponse:
     properties:
       code:
@@ -185,6 +242,29 @@ info:
   contact: {}
 paths:
   /forums:
+    get:
+      consumes:
+      - application/json
+      description: GetAllPublicFroums
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取全部公开论坛
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.StatusOKResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/controllers.ForumResponse'
+              type: object
+        "500":
+          description: 服务器错误
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: GetAllPublicFroums
+      tags:
+      - Forums
     post:
       consumes:
       - application/json
@@ -224,6 +304,30 @@ paths:
           schema:
             $ref: '#/definitions/responses.StatusInternalServerError'
       summary: CreateForum
+      tags:
+      - Forums
+  /forums/{forum_id}:
+    get:
+      consumes:
+      - application/json
+      description: GetForumByID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取全部公开论坛
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.StatusOKResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/controllers.ForumResponse'
+              type: object
+        "500":
+          description: 服务器错误
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: GetForumByID
       tags:
       - Forums
   /forums/{forum_id}/cover:

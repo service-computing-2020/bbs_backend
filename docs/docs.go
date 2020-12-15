@@ -25,6 +25,45 @@ var doc = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/forums": {
+            "get": {
+                "description": "GetAllPublicFroums",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Forums"
+                ],
+                "summary": "GetAllPublicFroums",
+                "responses": {
+                    "200": {
+                        "description": "获取全部公开论坛",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/responses.StatusOKResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/controllers.ForumResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "服务器错误",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusInternalServerError"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "CreateForum",
                 "consumes": [
@@ -77,6 +116,47 @@ var doc = `{
                         "description": "参数不合法",
                         "schema": {
                             "$ref": "#/definitions/responses.StatusBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器错误",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusInternalServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/forums/{forum_id}": {
+            "get": {
+                "description": "GetForumByID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Forums"
+                ],
+                "summary": "GetForumByID",
+                "responses": {
+                    "200": {
+                        "description": "获取全部公开论坛",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/responses.StatusOKResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/controllers.ForumResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
@@ -1326,6 +1406,20 @@ var doc = `{
         }
     },
     "definitions": {
+        "controllers.ForumResponse": {
+            "type": "object",
+            "properties": {
+                "forums": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Forum"
+                    }
+                },
+                "user_detail": {
+                    "$ref": "#/definitions/models.UserDetail"
+                }
+            }
+        },
         "controllers.LoginResponse": {
             "type": "object",
             "properties": {
@@ -1393,6 +1487,41 @@ var doc = `{
                     "type": "string"
                 },
                 "postID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Forum": {
+            "type": "object",
+            "properties": {
+                "admin_list": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "cover": {
+                    "type": "string"
+                },
+                "create_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "forum_id": {
+                    "type": "integer"
+                },
+                "forum_name": {
+                    "type": "string"
+                },
+                "is_public": {
+                    "type": "boolean"
+                },
+                "post_num": {
+                    "type": "integer"
+                },
+                "subscribe_num": {
                     "type": "integer"
                 }
             }
@@ -1535,6 +1664,44 @@ var doc = `{
                 },
                 "password": {
                     "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserDetail": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "create_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "is_admin": {
+                    "type": "boolean"
+                },
+                "participate_list": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "password": {
+                    "type": "string"
+                },
+                "star_list": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "user_id": {
                     "type": "integer"

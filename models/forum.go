@@ -2,16 +2,20 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 )
 
 type Forum struct {
-	ForumID     int    `json:"forum_id"`
-	ForumName   string `json:"forum_name"`
-	IsPublic    bool   `json:"is_public"`
-	Description string `json:"description"`
-	CreateAt    string `json:"create_at"`
-	Cover       string `json:"cover"`
+	ForumID      int    `json:"forum_id"`
+	ForumName    string `json:"forum_name"`
+	IsPublic     bool   `json:"is_public"`
+	Description  string `json:"description"`
+	CreateAt     string `json:"create_at"`
+	Cover        string `json:"cover"`
+	PostNum      int    `json:"post_num"`
+	SubscribeNum int    `json:"subscribe_num"`
+	AdminList    []int  `json:"admin_list"`
 }
 
 // 包含 forum 信息的用户
@@ -82,7 +86,26 @@ func GetAllPublicForums() ([]Forum, error) {
 	}
 
 	for _, r := range res {
-		ret = append(ret, convertMapToForum(r))
+		// fmt.Println("forum_id is ", r["forum_id"])
+		// 拿到post数量
+		forum_id, _ := strconv.Atoi(r["forum_id"])
+		postNum, err := GetPostNumInForum(forum_id)
+		if err != nil {
+			fmt.Println(err)
+		}
+		subscribeNUm, err := GetSubscribeNumInForum(forum_id)
+		if err != nil {
+			fmt.Println(err)
+		}
+		adminList, err := GetAllAdminsInForum(forum_id)
+		if err != nil {
+			fmt.Println(err)
+		}
+		forum := convertMapToForum(r)
+		forum.PostNum = postNum
+		forum.SubscribeNum = subscribeNUm
+		forum.AdminList = adminList
+		ret = append(ret, forum)
 	}
 
 	return ret, nil
@@ -133,7 +156,23 @@ func GetForumByID(forum_id int) ([]Forum, error) {
 	}
 
 	for _, r := range res {
-		ret = append(ret, convertMapToForum(r))
+		postNum, err := GetPostNumInForum(forum_id)
+		if err != nil {
+			fmt.Println(err)
+		}
+		subscribeNUm, err := GetSubscribeNumInForum(forum_id)
+		if err != nil {
+			fmt.Println(err)
+		}
+		adminList, err := GetAllAdminsInForum(forum_id)
+		if err != nil {
+			fmt.Println(err)
+		}
+		forum := convertMapToForum(r)
+		forum.PostNum = postNum
+		forum.SubscribeNum = subscribeNUm
+		forum.AdminList = adminList
+		ret = append(ret, forum)
 	}
 
 	return ret, nil
@@ -159,6 +198,48 @@ SELECT user.user_id, user.username, user.email, user.is_admin, user.create_at, u
 	}
 
 	return users, nil
+}
+
+func GetPostNumInForum(forum_id int) (int, error) {
+	sentence := "SELECT COUNT(*) AS num FROM post WHERE forum_id=?"
+	res, err := QueryRows(sentence, forum_id)
+	if err != nil {
+		return -1, err
+	}
+	num, err := strconv.Atoi(res[0]["num"])
+	if err != nil {
+		return -1, err
+	}
+	// fmt.Println("postnum ", num)
+	return num, nil
+}
+
+func GetSubscribeNumInForum(forum_id int) (int, error) {
+	sentence := "SELECT COUNT(*) AS num FROM forum_user WHERE forum_id=?"
+	res, err := QueryRows(sentence, forum_id)
+	if err != nil {
+		return -1, err
+	}
+	num, err := strconv.Atoi(res[0]["num"])
+	if err != nil {
+		return -1, err
+	}
+	// fmt.Println("subscribe num ", num)
+	return num, nil
+}
+
+func GetAllAdminsInForum(forum_id int) ([]int, error) {
+	sentence := "SELECT user_id FROM forum_user WHERE forum_id=? AND role<>'user' ORDER BY role DESC"
+	res, err := QueryRows(sentence, forum_id)
+	if err != nil {
+		return nil, err
+	}
+	var adminList []int
+	for _, r := range res {
+		user_id, _ := strconv.Atoi(r["user_id"])
+		adminList = append(adminList, user_id)
+	}
+	return adminList, nil
 }
 
 // 根据用户id获取公开及其相关论坛

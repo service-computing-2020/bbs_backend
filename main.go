@@ -45,6 +45,7 @@ func main() {
 			// 单个论坛路由
 			singleForumRouter := forumRouter.Group("/:forum_id")
 			{
+				singleForumRouter.GET("", middlewares.VerifyJWT(), controllers.GetForumByID)
 				singleForumRouter.POST("/cover", middlewares.VerifyJWT(), controllers.UploadCover)
 				singleForumRouter.GET("/cover", controllers.GetCover)
 
