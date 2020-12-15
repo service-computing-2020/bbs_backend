@@ -191,7 +191,17 @@ func UploadCover(c *gin.Context) {
 func GetCover(c *gin.Context) {
 	log.Info("get cover controller")
 	var data interface{}
-	rawImage, err := service.FileDownload(c.Request.URL.Path, "cover", ".png")
+	forum_id, _ := strconv.Atoi(c.Param("forum_id"))
+	forums, _ := models.GetForumByID(forum_id)
+	fmt.Println("forum is", forums[0])
+	var filename string
+	if forums[0].Cover == "cover.png" {
+		filename = "cover"
+	} else {
+		filename = c.Request.URL.Path
+	}
+	fmt.Println("filename", filename)
+	rawImage, err := service.FileDownload(filename, "cover", ".png")
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"code": 404, "msg": "获取封面失败" + err.Error(), "data": data})
 	} else {
