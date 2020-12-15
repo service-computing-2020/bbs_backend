@@ -40,7 +40,7 @@ func main() {
 		}
 		forumRouter := api.Group("/forums")
 		{
-			forumRouter.GET("", middlewares.VerifyJWT(),controllers.GetAllPublicFroums)
+			forumRouter.GET("", middlewares.VerifyJWT(), controllers.GetAllPublicFroums)
 			forumRouter.POST("", middlewares.VerifyJWT(), controllers.CreateForum)
 			// 单个论坛路由
 			singleForumRouter := forumRouter.Group("/:forum_id")
@@ -64,6 +64,20 @@ func main() {
 							fileRouter.GET("", controllers.GetFilesByPostID)
 							fileRouter.GET("/:filename", controllers.GetOneFile)
 						}
+
+						// comment 路由
+						commentRouter := singlePostRouter.Group("/comments")
+						commentRouter.Use(middlewares.VerifyJWT(), middlewares.CanUserWatchTheForum())
+						{
+							commentRouter.POST("", controllers.CreateComment)
+							commentRouter.GET("", controllers.GetAllCommentsByPostID)
+
+							singleCommentRouter := commentRouter.Group("/:comment_id")
+							{
+								singleCommentRouter.GET("", controllers.GetOneCommentDetailByCommentID)
+							}
+						}
+
 					}
 				}
 

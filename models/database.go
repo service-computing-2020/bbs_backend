@@ -3,10 +3,11 @@ package models
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/spf13/viper"
 	"log"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/spf13/viper"
 )
 
 var DB *sql.DB
@@ -99,8 +100,6 @@ func init() {
 		log.Fatal("sql open error")
 	}
 
-	DB.SetConnMaxLifetime(100*time.Second) //最大连接周期，超时的连接就close
-	DB.SetMaxOpenConns(100)                //设置最大连接数
+	DB.SetConnMaxLifetime(100 * time.Second) //最大连接周期，超时的连接就close
+	DB.SetMaxOpenConns(100)                  //设置最大连接数
 }
-
-

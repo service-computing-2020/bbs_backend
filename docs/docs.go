@@ -476,6 +476,161 @@ var doc = `{
                 }
             }
         },
+        "/forums/{forum_id}/posts/{post_id}/comments": {
+            "get": {
+                "description": "GetAllCommentsByPostID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "GetAllCommentsByPostID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "获取评论成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/responses.StatusOKResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.Comment"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "查询数据库出现异常",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusInternalServerError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "CreateComment",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "CreateComment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comment 的内容",
+                        "name": "content",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "创建 comment 成功",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "评论的内容不得为空",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "插入用户创建的comment失败",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusInternalServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/forums/{forum_id}/posts/{post_id}/comments/{comment_id}": {
+            "get": {
+                "description": "GetOneCommentDetailByCommentID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "GetOneCommentDetailByCommentID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "获取评论成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/responses.StatusOKResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.CommentDetail"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "数据库查询异常，或者该comment不存在",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusInternalServerError"
+                        }
+                    }
+                }
+            }
+        },
         "/forums/{forum_id}/posts/{post_id}/files": {
             "get": {
                 "description": "GetFilesByPostID",
@@ -1179,6 +1334,46 @@ var doc = `{
                 },
                 "user_id": {
                     "type": "string"
+                }
+            }
+        },
+        "models.Comment": {
+            "type": "object",
+            "properties": {
+                "comment_id": {
+                    "type": "integer"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "create_at": {
+                    "type": "string"
+                },
+                "post_id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.CommentDetail": {
+            "type": "object",
+            "properties": {
+                "comment_id": {
+                    "type": "integer"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "create_at": {
+                    "type": "string"
+                },
+                "post_id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },

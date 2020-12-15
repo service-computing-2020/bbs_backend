@@ -6,6 +6,32 @@ definitions:
       user_id:
         type: string
     type: object
+  models.Comment:
+    properties:
+      comment_id:
+        type: integer
+      content:
+        type: string
+      create_at:
+        type: string
+      post_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  models.CommentDetail:
+    properties:
+      comment_id:
+        type: integer
+      content:
+        type: string
+      create_at:
+        type: string
+      post_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
   models.ExtendedFile:
     properties:
       bucket:
@@ -447,6 +473,103 @@ paths:
       summary: GetOnePostDetailByPostID
       tags:
       - Posts
+  /forums/{forum_id}/posts/{post_id}/comments:
+    get:
+      consumes:
+      - application/json
+      description: GetAllCommentsByPostID
+      parameters:
+      - description: 将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取评论成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.StatusOKResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Comment'
+                  type: array
+              type: object
+        "500":
+          description: 查询数据库出现异常
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: GetAllCommentsByPostID
+      tags:
+      - Comments
+    post:
+      consumes:
+      - multipart/form-data
+      description: CreateComment
+      parameters:
+      - description: 将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头
+        in: header
+        name: token
+        required: true
+        type: string
+      - description: Comment 的内容
+        in: formData
+        name: content
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建 comment 成功
+          schema:
+            $ref: '#/definitions/responses.StatusOKResponse'
+        "400":
+          description: 评论的内容不得为空
+          schema:
+            $ref: '#/definitions/responses.StatusBadRequestResponse'
+        "500":
+          description: 插入用户创建的comment失败
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: CreateComment
+      tags:
+      - Comments
+  /forums/{forum_id}/posts/{post_id}/comments/{comment_id}:
+    get:
+      consumes:
+      - application/json
+      description: GetOneCommentDetailByCommentID
+      parameters:
+      - description: 将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头
+        in: header
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取评论成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.StatusOKResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.CommentDetail'
+                  type: array
+              type: object
+        "400":
+          description: 数据库查询异常，或者该comment不存在
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: GetOneCommentDetailByCommentID
+      tags:
+      - Comments
   /forums/{forum_id}/posts/{post_id}/files:
     get:
       consumes:
