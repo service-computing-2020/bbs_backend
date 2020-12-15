@@ -109,3 +109,5 @@ func GetOneUserDetail(userID int) (models.UserDetail, error) {
 
 	return userDetail, nil
 }
+
+

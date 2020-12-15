@@ -78,8 +78,8 @@ type LoginParam struct {
 
 // 登录成功返回的结果
 type LoginResponse struct {
-	Token	string `json:"token"`
-	UserId	string `json:"user_id"`
+	Token  string `json:"token"`
+	UserId string `json:"user_id"`
 }
 
 // 用户登录控制器
@@ -216,7 +216,13 @@ func UploadAvatar(c *gin.Context) {
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "文件服务错误: " + err.Error(), "data": data})
 		} else {
-
+			// 写入数据库
+			avatar := service.GetUploadName(path.Base(c.Request.URL.Path), ".png")
+			err := models.UpdateUserAvatarByUserId(user_id, avatar)
+			if err != nil {
+			    c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "数据库写入错误: " + err.Error(), "data": nil})
+			    return
+			}
 			c.JSON(http.StatusOK, gin.H{"code": 200, "msg": "上传头像成功", "data": data})
 		}
 	}
@@ -239,11 +245,45 @@ func UploadAvatar(c *gin.Context) {
 func GetAvatar(c *gin.Context) {
 	log.Info("get user's avatar controller")
 	var data interface{}
-	rawImage, err := service.FileDownload(c.Request.URL.Path, "avatar", ".png")
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"code": 404, "msg": "获取头像失败" + err.Error(), "data": data})
+	userInfo := service.GetUserFromContext(c)
 
+	users, err := models.GetUserById(userInfo.UserId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "数据库查询出错: " + err.Error(), "data": nil})
+		return
+	}
+	if len(users) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "该用户不存在", "data": nil})
+		return
+	}
+	user := users[0]
+	if user.Avatar == "0.jpg" {
+		// 下载默认头像
+		rawImage, err := service.FileDownloadByName("0.jpg", "avatar")
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"code": 404, "msg": "获取默认头像失败" + err.Error(), "data": data})
+			return
+		}
+		// 图片最多5个M
+		image := make([]byte, 5000000)
+		len, err := rawImage.Read(image)
+		if err != nil {
+			if err != io.EOF && err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "读取图片失败 " + err.Error(), "data": data})
+			} else {
+				c.Writer.WriteHeader(http.StatusOK)
+				c.Header("Content-Disposition", "attachment; filename=hello.txt")
+				c.Header("Content-Type", "image/jpeg")
+				c.Header("Accept-Length", fmt.Sprintf("%d", len))
+				c.Writer.Write(image)
+			}
+		}
 	} else {
+		rawImage, err := service.FileDownload(c.Request.URL.Path, "avatar", ".png")
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"code": 404, "msg": "获取头像失败" + err.Error(), "data": data})
+			return
+		}
 		// 图片最多5个M
 		image := make([]byte, 5000000)
 		len, err := rawImage.Read(image)
@@ -259,6 +299,7 @@ func GetAvatar(c *gin.Context) {
 			}
 		}
 	}
+
 }
 
 // 获取用户的关注订阅列表
@@ -277,8 +318,8 @@ func GetOneUserSubscribe(c *gin.Context) {
 
 	subscribe, err := service.GetOneUserSubscribe(user_id)
 	if err != nil {
-	    c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "数据库查询出错", "data": nil})
-	    return
+		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "数据库查询出错", "data": nil})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"code": 200, "msg": fmt.Sprintf("获取第 %d 号用户的关注订阅列表成功", user_id), "data": subscribe})
 	return

@@ -137,4 +137,12 @@ func GetOneUserSubscribe(userID int) (SubscribeList, error) {
 	return ret, nil
 }
 
+func UpdateUserAvatarByUserId(userID int, avatar_path string) error {
+	sql :=
+		`
+		UPDATE user SET avatar=? WHERE user_id=?
+		`
+	_, err := Execute(sql, avatar_path, userID)
+	return err
+}
 

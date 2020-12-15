@@ -11,7 +11,7 @@ require (
 	github.com/go-ini/ini v1.62.0 // indirect
 	github.com/go-openapi/spec v0.20.0 // indirect
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/minio/minio-go v6.0.14+incompatible // indirect
+	github.com/minio/minio-go v6.0.14+incompatible
 	github.com/minio/minio-go/v7 v7.0.6
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/pingcap/log v0.0.0-20201112100606-8f1e84a3abc8

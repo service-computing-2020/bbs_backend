@@ -44,13 +44,13 @@ func init() {
 }
 
 // 传入api路径和文件扩展名，如 getUploadName('/api/users/1/avatar', '.png')
-func getUploadName(path string, ext string) string {
+func GetUploadName(path string, ext string) string {
 	prefix := strings.ReplaceAll(path, "/", "-")
 	return fmt.Sprintf("%s%s",prefix, ext)
 }
 
 // 同上
-func getDownloadName(path string, ext string) string {
+func GetDownloadName(path string, ext string) string {
 	return strings.ReplaceAll(path, "/", "-") + ext
 }
 
@@ -84,17 +84,17 @@ func FileDelete(filename string, bucketName string) error{
 func FileUpload(file multipart.File,header *multipart.FileHeader, bucketName string, path string, ext string)(filename string, err error) {
 	ctx := context.Background()
 
-	_, err = MinioClient.PutObject(ctx, bucketName, getUploadName(path, ext), file, header.Size, minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	_, err = MinioClient.PutObject(ctx, bucketName, GetUploadName(path, ext), file, header.Size, minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	if err != nil {
 		return "", err
 	} else {
-		return getUploadName(path, ext), err
+		return GetUploadName(path, ext), err
 	}
 }
 
 func FileDownload(filename string, bucketName string, ext string) (*minio.Object, error) {
 	ctx := context.Background()
-	return MinioClient.GetObject(ctx, bucketName, getDownloadName(filename, ext), minio.GetObjectOptions{})
+	return MinioClient.GetObject(ctx, bucketName, GetDownloadName(filename, ext), minio.GetObjectOptions{})
 }
 
 func FileDownloadByName(filename string, bucketName string) (*minio.Object, error) {
