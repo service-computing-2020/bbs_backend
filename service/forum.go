@@ -10,6 +10,7 @@ func CreateForum(forumName, description string, isPublic bool) (int64, error) {
 		ForumName:   forumName,
 		IsPublic:    isPublic,
 		Description: description,
+		Cover:       "cover.png",
 	}
 	return models.CreateForum(forum)
 }
