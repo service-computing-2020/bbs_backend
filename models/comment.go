@@ -8,6 +8,7 @@ type Comment struct {
 	CommentID int    `json:"comment_id"`
 	PostID    int    `json:"post_id"`
 	UserID    int    `json:"user_id"`
+	UserName  string `json:"username"`
 	Content   string `json:"content"`
 	CreateAt  string `json:"create_at"`
 }
@@ -25,6 +26,7 @@ func convertMapToComment(comment map[string]string) Comment {
 		CommentID: comment_id,
 		PostID:    post_id,
 		UserID:    user_id,
+		UserName:  comment["username"],
 		Content:   comment["content"],
 		CreateAt:  comment["create_at"],
 	}
@@ -39,7 +41,7 @@ func CreateComment(comment Comment) (int64, error) {
 // 获取给定的 PostID 下的全部 comments
 func GetAllCommentsByPostID(post_id int) ([]Comment, error) {
 	var ret []Comment
-	res, err := QueryRows("SELECT * FROM comment WHERE post_id=?", post_id)
+	res, err := QueryRows("SELECT comment_id, post_id, comment.user_id, content, comment.create_at, comment.like, username FROM comment LEFT JOIN user ON comment.user_id=user.user_id WHERE post_id=?", post_id)
 	if err != nil {
 		return ret, err
 	}
@@ -53,7 +55,7 @@ func GetAllCommentsByPostID(post_id int) ([]Comment, error) {
 // 根据id获取某个 Comment
 func GetOneCommentByCommentID(comment_id int) ([]Comment, error) {
 	var ret []Comment
-	res, err := QueryRows("SELECT * FROM comment WHERE comment_id=?", comment_id)
+	res, err := QueryRows("SELECT comment_id, post_id, comment.user_id, content, comment.create_at, comment.like, username FROM comment LEFT JOIN user ON comment.user_id=user.user_id WHERE comment_id=?", comment_id)
 	if err != nil {
 		return ret, err
 	}

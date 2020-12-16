@@ -1448,6 +1448,9 @@ var doc = `{
                 },
                 "user_id": {
                     "type": "integer"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },
@@ -1468,6 +1471,9 @@ var doc = `{
                 },
                 "user_id": {
                     "type": "integer"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },

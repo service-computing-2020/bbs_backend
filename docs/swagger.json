@@ -1428,6 +1428,9 @@
                 },
                 "user_id": {
                     "type": "integer"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },
@@ -1448,6 +1451,9 @@
                 },
                 "user_id": {
                     "type": "integer"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },
