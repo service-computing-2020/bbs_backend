@@ -130,3 +130,19 @@ func GetOnePostDetailByPostID(c *gin.Context) {
 		"data": data,
 	})
 }
+
+
+func LikeOnePostByPostID(c *gin.Context) {
+	log.Info("like one post by post id contaroller")
+	post_id, _ := strconv.Atoi(c.Param("post_id"))
+	user := service.GetUserFromContext(c)
+	user_id := user.UserId
+
+	err := models.LikeOnePostByUserIDAndPostID(user_id, post_id)
+	if err != nil {
+	    c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "点赞失败，您已经点过赞啦 " + err.Error(), "data": nil})
+	    return
+	}
+	c.JSON(http.StatusOK, gin.H{"code": 200, "msg": "点赞成功", "data": nil})
+	return
+}

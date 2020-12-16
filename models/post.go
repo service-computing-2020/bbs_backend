@@ -1,6 +1,9 @@
 package models
 
-import "strconv"
+import (
+	"errors"
+	"strconv"
+)
 
 type Post struct {
 	PostID   int    `json:"post_id"`
@@ -66,4 +69,37 @@ func GetOnePostByPostID(post_id int) ([]Post, error) {
 		ret = append(ret, convertMapToPost(p))
 	}
 	return ret, nil
+}
+
+func LikeOnePostByUserIDAndPostID(userID int, postID int) error {
+	sql1 :=
+		`
+			SELECT * FROM post_like WHERE user_id = ? AND post_id = ?;
+		`
+	ret, err := QueryRows(sql1, userID, postID)
+	if err != nil {
+		return err
+	}
+	if len(ret) > 0 {
+		return errors.New("您已经点赞过了")
+	}
+
+	sql2 :=
+		`
+			INSERT INTO post_like(user_id, post_id) VALUES (?, ?);
+		`
+	_, err = Execute(sql2, userID, postID)
+	if err != nil {
+		return err
+	}
+
+	sql3 :=
+		`
+			UPDATE post SET post.like = post.like+1 WHERE post.post_id = ?
+		`
+	_, err = Execute(sql3, postID)
+	if err != nil {
+		return err
+	}
+	return nil
 }

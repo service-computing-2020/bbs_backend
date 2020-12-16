@@ -59,6 +59,7 @@ func main() {
 					singlePostRouter := postRouter.Group("/:post_id")
 					{
 						singlePostRouter.GET("", controllers.GetOnePostDetailByPostID)
+						singlePostRouter.POST("/likes", controllers.LikeOnePostByPostID)
 
 						fileRouter := singlePostRouter.Group("/files")
 						{
