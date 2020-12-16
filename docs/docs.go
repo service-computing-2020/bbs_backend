@@ -423,7 +423,7 @@ var doc = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/models.Post"
+                                                "$ref": "#/definitions/models.PostDetail"
                                             }
                                         }
                                     }
@@ -1562,32 +1562,6 @@ var doc = `{
                     "type": "integer"
                 },
                 "hole_id": {
-                    "type": "integer"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.Post": {
-            "type": "object",
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "create_at": {
-                    "type": "string"
-                },
-                "forum_id": {
-                    "type": "integer"
-                },
-                "like": {
-                    "type": "integer"
-                },
-                "post_id": {
                     "type": "integer"
                 },
                 "title": {

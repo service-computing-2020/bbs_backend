@@ -9,6 +9,24 @@ func GetAllPostsByForumID(forum_id int) ([]models.Post, error){
 	return models.GetAllPostsByForumID(forum_id)
 }
 
+func GetAllPostDetailsByForumID(forum_id int) ([]models.PostDetail, error) {
+	posts, err := GetAllPostsByForumID(forum_id)
+	if err != nil {
+		return nil, err
+	}
+
+	var postDetails []models.PostDetail
+	for _, post := range posts {
+		files, err := models.GetFilesByPostID(post.PostID)
+		if err != nil {
+			return nil, err
+		}
+		postDetail := models.PostDetail{Files: files, Post: post}
+		postDetails = append(postDetails, postDetail)
+	}
+	return postDetails, nil
+}
+
 // 根据 post_id 获取一个post的详情
 func GetOnePostDetailByPostID(post_id int) ([]models.PostDetail, error) {
 	var postDetails []models.PostDetail

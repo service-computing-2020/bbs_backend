@@ -14,7 +14,7 @@ type Post struct {
 
 type PostDetail struct {
 	Post
-	Files []ExtendedFile
+	Files []ExtendedFile		`json:"files"`
 }
 
 // 将数据库查询结果转换为 POST

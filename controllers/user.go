@@ -316,6 +316,7 @@ func GetOneUserSubscribe(c *gin.Context) {
 	log.Info("get one user's subscribe controller")
 	user_id, _ := strconv.Atoi(c.Param("user_id"))
 
+
 	subscribe, err := service.GetOneUserSubscribe(user_id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "数据库查询出错", "data": nil})

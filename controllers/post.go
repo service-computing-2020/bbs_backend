@@ -84,14 +84,14 @@ func CreatePost(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param token header string true "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头""
-// @Success 200 {object} responses.StatusOKResponse{data=[]models.Post}
+// @Success 200 {object} responses.StatusOKResponse{data=[]models.PostDetail}
 // @Failure 500 {object} responses.StatusInternalServerError "服务器错误"
 // @Router /forums/{forum_id}/posts [get]
 func GetAllPostsByForumID(c *gin.Context) {
 	log.Info("get all posts by forum_id controller")
 	forum_id, _ := strconv.Atoi(c.Param("forum_id"))
 
-	data, err := service.GetAllPostsByForumID(forum_id)
+	data, err := service.GetAllPostDetailsByForumID(forum_id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "查询数据库出现异常" + err.Error(), "data": nil})
 		return

@@ -107,23 +107,6 @@ definitions:
       user_id:
         type: integer
     type: object
-  models.Post:
-    properties:
-      content:
-        type: string
-      create_at:
-        type: string
-      forum_id:
-        type: integer
-      like:
-        type: integer
-      post_id:
-        type: integer
-      title:
-        type: string
-      user_id:
-        type: integer
-    type: object
   models.PostDetail:
     properties:
       content:
@@ -492,7 +475,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/models.Post'
+                    $ref: '#/definitions/models.PostDetail'
                   type: array
               type: object
         "500":
