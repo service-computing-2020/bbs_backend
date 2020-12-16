@@ -73,7 +73,7 @@ func GetOneFile(c *gin.Context){
 			"data": nil,
 		})
 	} else {
-		image := make([]byte, 5000000)
+		image := make([]byte, 3000000)
 		len, err := rawFile.Read(image)
 		if err != nil {
 			if err != io.EOF && err != nil {

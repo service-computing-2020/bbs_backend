@@ -264,8 +264,8 @@ func GetAvatar(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"code": 404, "msg": "获取默认头像失败" + err.Error(), "data": data})
 			return
 		}
-		// 图片最多5个M
-		image := make([]byte, 5000000)
+		// 图片最多3个M
+		image := make([]byte, 3000000)
 		len, err := rawImage.Read(image)
 		if err != nil {
 			if err != io.EOF && err != nil {
@@ -284,8 +284,8 @@ func GetAvatar(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"code": 404, "msg": "获取头像失败" + err.Error(), "data": data})
 			return
 		}
-		// 图片最多5个M
-		image := make([]byte, 5000000)
+		// 图片最多3个M
+		image := make([]byte, 1000000)
 		len, err := rawImage.Read(image)
 		if err != nil {
 			if err != io.EOF && err != nil {
