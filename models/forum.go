@@ -79,7 +79,7 @@ func GetCoverURL(forumID int) error {
 func GetAllPublicForums() ([]Forum, error) {
 	var ret []Forum
 
-	res, err := QueryRows("SELECT forum_id, forum_name, is_public, description, create_at, cover FROM forum WHERE is_public = 1")
+	res, err := QueryRows("SELECT forum_id, forum_name, is_public, description, create_at, cover FROM forum WHERE is_public = 1 ORDER BY create_at DESC")
 
 	if err != nil {
 		return nil, err

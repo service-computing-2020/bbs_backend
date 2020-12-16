@@ -13,6 +13,7 @@ type Post struct {
 	Content  string `json:"content"`
 	CreateAt string `json:"create_at"`
 	Like     int    `json:"like"`
+	Username string `json:"username"`
 }
 
 type PostDetail struct {
@@ -34,6 +35,7 @@ func convertMapToPost(post map[string]string) Post {
 		Content:  post["content"],
 		CreateAt: post["create_at"],
 		Like:     like,
+		Username: post["username"],
 	}
 }
 
@@ -46,12 +48,13 @@ func CreatePost(post Post) (int64, error) {
 // 获取某个 forum 下的全部 posts
 func GetAllPostsByForumID(forum_id int) ([]Post, error) {
 	var ret []Post
-	res, err := QueryRows("SELECT * FROM post WHERE forum_id=?", forum_id)
+	res, err := QueryRows("SELECT post.post_id, post.forum_id, post.user_id, post.title, post.content, post.create_at, post.like, user.username \n\tFROM post INNER JOIN user ON post.user_id = user.user_id WHERE post.forum_id=? ORDER BY post.create_at DESC", forum_id)
 	if err != nil {
 		return ret, err
 	}
 
 	for _, p := range res {
+
 		ret = append(ret, convertMapToPost(p))
 	}
 	return ret, nil

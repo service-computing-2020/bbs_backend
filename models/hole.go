@@ -40,7 +40,7 @@ func CreateHole(hole Hole) (int64, error) {
 // 获取某个 forum 下的全部 holes
 func GetAllHolesByForumID(forum_id int) ([]Hole, error) {
 	var ret []Hole
-	res, err := QueryRows("SELECT * FROM hole WHERE forum_id=?", forum_id)
+	res, err := QueryRows("SELECT * FROM hole WHERE forum_id=? ORDER BY create_at DESC", forum_id)
 	if err != nil {
 		return ret, err
 	}
