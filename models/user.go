@@ -1,24 +1,23 @@
 package models
 
 import (
+	"fmt"
 	"strconv"
 )
 
 type User struct {
-
-	UserId     	int		`json:"user_id"`
-	Username    string	`json:"username"`
-	Email		string  `json:"email"`
-	Password	string	`json:"password"`
-	IsAdmin		bool	`json:"is_admin"`
-	Avatar		string	`json:"avatar"`
-	CreateAt	string	`json:"create_at"`
-
+	UserId   int    `json:"user_id"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	IsAdmin  bool   `json:"is_admin"`
+	Avatar   string `json:"avatar"`
+	CreateAt string `json:"create_at"`
 }
 
 type SubscribeList struct {
-	ParticipateList []int	`json:"participate_list"`
-	FocusList		[]int	`json:"star_list"`
+	ParticipateList []int `json:"participate_list"`
+	FocusList       []int `json:"star_list"`
 }
 
 type UserDetail struct {
@@ -34,11 +33,11 @@ func convertMapToUser(user map[string]string) User {
 		is_admin = true
 	}
 
-	return User{UserId: user_id, Username: user["username"], Email: user["email"],Password: user["password"], IsAdmin: is_admin, Avatar: user["avatar"], CreateAt: user["create_at"]}
+	return User{UserId: user_id, Username: user["username"], Email: user["email"], Password: user["password"], IsAdmin: is_admin, Avatar: user["avatar"], CreateAt: user["create_at"]}
 }
 
 // 创建用户
-func CreateUser(user User) error{
+func CreateUser(user User) error {
 	sentence := "INSERT INTO user(username, password, email ,is_admin, avatar) VALUES(?, ?, ?, ?, ?)"
 	_, err := Execute(sentence, user.Username, user.Password, user.Email, user.IsAdmin, user.Avatar)
 	return err
@@ -110,6 +109,22 @@ func GetAllUsers() ([]User, error) {
 	return ret, err
 }
 
+func GetAllUsersContains(str string) ([]User, error) {
+	var ret []User
+	query := fmt.Sprintf("SELECT user_id, username, password, email,is_admin, create_at, avatar FROM user WHERE username LIKE %s", strconv.Quote("%"+str+"%"))
+	res, err := QueryRows(query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, r := range res {
+		ret = append(ret, convertMapToUser(r))
+	}
+
+	return ret, err
+}
+
 // 根据用户id获取某个用户信息以及所参与的/关注的列表
 func GetOneUserSubscribe(userID int) (SubscribeList, error) {
 	var ret SubscribeList
@@ -145,4 +160,3 @@ func UpdateUserAvatarByUserId(userID int, avatar_path string) error {
 	_, err := Execute(sql, avatar_path, userID)
 	return err
 }
-

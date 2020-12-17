@@ -823,6 +823,57 @@ var doc = `{
             }
         },
         "/forums/{forum_id}/role": {
+            "put": {
+                "description": "AddUsersToForum",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "AddUsersToForum",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头",
+                        "name": "token",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "用户id列表",
+                        "name": "users",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.UsersListParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "订阅成功",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusOKResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "不可重复订阅",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusForbiddenResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器错误",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StatusInternalServerError"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "SubscribeForum",
                 "consumes": [
@@ -1072,6 +1123,12 @@ var doc = `{
                         "name": "token",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "用户名的子串",
+                        "name": "username",
+                        "in": "header"
                     }
                 ],
                 "responses": {
@@ -1428,6 +1485,17 @@ var doc = `{
                 },
                 "user_id": {
                     "type": "string"
+                }
+            }
+        },
+        "controllers.UsersListParam": {
+            "type": "object",
+            "properties": {
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },

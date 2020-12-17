@@ -389,3 +389,52 @@ func UnSubscribeForum(c *gin.Context) {
 	// 订阅成功
 	c.JSON(http.StatusOK, gin.H{"code": 200, "msg": "取消订阅成功", "data": nil})
 }
+
+type UsersListParam struct {
+	Users []int `json:"users"`
+}
+
+// 批量添加用户
+// AddUsersToForum godoc
+// @Summary AddUsersToForum
+// @Description AddUsersToForum
+// @Tags Role
+// @Accept  json
+// @Produce  json
+// @Param token header string true "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头""
+// @Param users body UsersListParam true "用户id列表"
+// @Success 200 {object} responses.StatusOKResponse "订阅成功"
+// @Failure 403 {object} responses.StatusForbiddenResponse "不可重复订阅"
+// @Failure 500 {object} responses.StatusInternalServerError "服务器错误"
+// @Router /forums/{forum_id}/role [put]
+func AddUsersToForum(c *gin.Context) {
+	log.Info("add users to forum controller")
+	forum_id, _ := strconv.Atoi(c.Param("forum_id"))
+	// 用户id
+	// user_id := service.GetUserFromContext(c).UserId
+	// 不能重复订阅
+	// role, _ := models.FindRoleInForum(forum_id, user_id)
+	// if role != "" {
+	// 	// 重复订阅失败
+	// 	c.JSON(http.StatusForbidden, gin.H{"code": 403, "msg": "不可重复订阅", "data": nil})
+	// 	return
+	// }
+	var idList UsersListParam
+	err := c.BindJSON(&idList)
+	if err != nil {
+		// 参数错误
+		c.JSON(http.StatusBadRequest, gin.H{"code": 400, "msg": "请求格式不正确: " + err.Error(), "data": nil})
+		return
+	}
+	for _, r := range idList.Users {
+		// fmt.Println("user", r)
+		err := models.AddRoleInForum(forum_id, r, "user")
+		if err != nil {
+			// 服务器错误
+			c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "服务器错误: " + err.Error(), "data": nil})
+			return
+		}
+	}
+	// 订阅成功
+	c.JSON(http.StatusOK, gin.H{"code": 200, "msg": "订阅成功", "data": nil})
+}

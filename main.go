@@ -101,6 +101,7 @@ func main() {
 				{
 					roleRouter.POST("", middlewares.VerifyJWT(), controllers.SubscribeForum)
 					roleRouter.DELETE("", middlewares.VerifyJWT(), controllers.UnSubscribeForum)
+					roleRouter.PUT("", middlewares.VerifyJWT(), controllers.AddUsersToForum)
 					roleRouter.GET("/:user_id", controllers.GetRoleInForum)
 					roleRouter.PATCH("/:user_id", middlewares.VerifyJWT(), controllers.UpdateRoleInForum)
 				}

@@ -167,12 +167,22 @@ func UserLogin(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param token header string true "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头""
+// @Param username header string false "用户名的子串"
 // @Success 200 {object} responses.StatusOKResponse{data=[]models.User} "获取全部用户"
 // @Failure 500 {object} responses.StatusInternalServerError "服务器错误"
 // @Router /users [get]
 func GetAllUsers(c *gin.Context) {
 	log.Info("get all users controller")
-	data, err := models.GetAllUsers()
+
+	var data []models.User
+	var err error
+	query := c.Query("username")
+	// fmt.Println("query", query)
+	if query != "" {
+		data, err = models.GetAllUsersContains(query)
+	} else {
+		data, err = models.GetAllUsers()
+	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "服务器错误: " + err.Error(), "data": data})
 		return
@@ -220,8 +230,8 @@ func UploadAvatar(c *gin.Context) {
 			avatar := service.GetUploadName(path.Base(c.Request.URL.Path), ".png")
 			err := models.UpdateUserAvatarByUserId(user_id, avatar)
 			if err != nil {
-			    c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "数据库写入错误: " + err.Error(), "data": nil})
-			    return
+				c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "数据库写入错误: " + err.Error(), "data": nil})
+				return
 			}
 			c.JSON(http.StatusOK, gin.H{"code": 200, "msg": "上传头像成功", "data": data})
 		}
@@ -315,7 +325,6 @@ func GetAvatar(c *gin.Context) {
 func GetOneUserSubscribe(c *gin.Context) {
 	log.Info("get one user's subscribe controller")
 	user_id, _ := strconv.Atoi(c.Param("user_id"))
-
 
 	subscribe, err := service.GetOneUserSubscribe(user_id)
 	if err != nil {

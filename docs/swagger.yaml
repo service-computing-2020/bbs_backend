@@ -15,6 +15,13 @@ definitions:
       user_id:
         type: string
     type: object
+  controllers.UsersListParam:
+    properties:
+      users:
+        items:
+          type: integer
+        type: array
+    type: object
   models.Comment:
     properties:
       comment_id:
@@ -784,6 +791,40 @@ paths:
       summary: SubscribeForum
       tags:
       - Role
+    put:
+      consumes:
+      - application/json
+      description: AddUsersToForum
+      parameters:
+      - description: 将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头
+        in: header
+        name: token
+        required: true
+        type: string
+      - description: 用户id列表
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UsersListParam'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 订阅成功
+          schema:
+            $ref: '#/definitions/responses.StatusOKResponse'
+        "403":
+          description: 不可重复订阅
+          schema:
+            $ref: '#/definitions/responses.StatusForbiddenResponse'
+        "500":
+          description: 服务器错误
+          schema:
+            $ref: '#/definitions/responses.StatusInternalServerError'
+      summary: AddUsersToForum
+      tags:
+      - Role
   /forums/{forum_id}/role/{user_id}:
     get:
       consumes:
@@ -891,6 +932,10 @@ paths:
         in: header
         name: token
         required: true
+        type: string
+      - description: 用户名的子串
+        in: header
+        name: username
         type: string
       produces:
       - application/json
