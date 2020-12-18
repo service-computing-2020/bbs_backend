@@ -52,7 +52,7 @@ func CreatePost(c *gin.Context) {
 		filesToBeUpload = append(filesToBeUpload, service.File{F: f, H: fileHeader})
 	}
 	bucketName := path.Base(c.Request.URL.Path)
-	names, err := service.MultipleFilesUpload(filesToBeUpload, bucketName, c.Request.URL.Path, ".png")
+	names, err := service.MultipleFilesUpload(filesToBeUpload, "posts", c.Request.URL.Path, ".png")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "上传文件失败，服务器内部错误" + err.Error(), "data": data})
 		return

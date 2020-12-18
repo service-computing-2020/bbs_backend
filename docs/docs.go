@@ -1485,14 +1485,6 @@ var doc = `{
                 }
             }
         },
-        "controllers.UsersListParam": {
-            "type": "object",
-            "properties": {
-                "users": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
         "controllers.PostsAndUserDetail": {
             "type": "object",
             "properties": {
@@ -1504,6 +1496,17 @@ var doc = `{
                 },
                 "user": {
                     "$ref": "#/definitions/models.UserDetail"
+                }
+            }
+        },
+        "controllers.UsersListParam": {
+            "type": "object",
+            "properties": {
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
@@ -1747,7 +1750,7 @@ var doc = `{
                 "is_admin": {
                     "type": "boolean"
                 },
-                "likeList": {
+                "like_list": {
                     "type": "array",
                     "items": {
                         "type": "integer"

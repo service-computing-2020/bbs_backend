@@ -15,12 +15,6 @@ definitions:
       user_id:
         type: string
     type: object
-  controllers.UsersListParam:
-    properties:
-      users:
-        items:
-          type: integer
-        type: array
   controllers.PostsAndUserDetail:
     properties:
       posts:
@@ -29,6 +23,13 @@ definitions:
         type: array
       user:
         $ref: '#/definitions/models.UserDetail'
+    type: object
+  controllers.UsersListParam:
+    properties:
+      users:
+        items:
+          type: integer
+        type: array
     type: object
   models.Comment:
     properties:
@@ -187,7 +188,7 @@ definitions:
         type: string
       is_admin:
         type: boolean
-      likeList:
+      like_list:
         items:
           type: integer
         type: array
