@@ -104,8 +104,13 @@ func GetOneUserDetail(userID int) (models.UserDetail, error) {
 		return userDetail, err
 	}
 
+	likeList, err := models.GetOneUserLikeListByUserID(userID)
+	if err != nil {
+		return userDetail, err
+	}
 	userDetail.User = user[0]
 	userDetail.SubscribeList = subscribe
+	userDetail.LikeList = likeList
 
 	return userDetail, nil
 }

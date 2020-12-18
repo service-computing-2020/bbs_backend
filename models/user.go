@@ -23,6 +23,7 @@ type SubscribeList struct {
 type UserDetail struct {
 	User
 	SubscribeList
+	LikeList []int `json:"like_list"`
 }
 
 // 将数据库查询的结果转换为 User
@@ -159,4 +160,24 @@ func UpdateUserAvatarByUserId(userID int, avatar_path string) error {
 		`
 	_, err := Execute(sql, avatar_path, userID)
 	return err
+}
+
+func GetOneUserLikeListByUserID(userID int) ([]int, error) {
+	sql :=
+		`
+		SELECT post_id FROM post_like WHERE user_id = ?;
+		`
+	data, err := QueryRows(sql, userID)
+	if err != nil {
+		return nil, err
+	}
+	var ret []int
+	for _, val := range data {
+		id, err := strconv.Atoi(val["post_id"])
+		if err != nil {
+			return nil, err
+		}
+		ret = append(ret, id)
+	}
+	return ret, nil
 }

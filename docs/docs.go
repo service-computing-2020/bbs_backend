@@ -421,10 +421,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/models.PostDetail"
-                                            }
+                                            "$ref": "#/definitions/controllers.PostsAndUserDetail"
                                         }
                                     }
                                 }
@@ -1496,6 +1493,17 @@ var doc = `{
                     "items": {
                         "type": "integer"
                     }
+        "controllers.PostsAndUserDetail": {
+            "type": "object",
+            "properties": {
+                "posts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.PostDetail"
+                    }
+                },
+                "user": {
+                    "$ref": "#/definitions/models.UserDetail"
                 }
             }
         },
@@ -1738,6 +1746,12 @@ var doc = `{
                 },
                 "is_admin": {
                     "type": "boolean"
+                },
+                "likeList": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "participate_list": {
                     "type": "array",

@@ -76,6 +76,11 @@ func CreatePost(c *gin.Context) {
 	return
 }
 
+
+type PostsAndUserDetail struct {
+	PostDetails []models.PostDetail	`json:"posts"`
+	UserDetail models.UserDetail	`json:"user"`
+}
 // 获取某个 forum 下的所有post
 // GetAllPostsByForumID godoc
 // @Summary GetAllPostsByForumID
@@ -84,23 +89,30 @@ func CreatePost(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param token header string true "将token放在请求头部的‘Authorization‘字段中，并以‘Bearer ‘开头""
-// @Success 200 {object} responses.StatusOKResponse{data=[]models.PostDetail}
+// @Success 200 {object} responses.StatusOKResponse{data=PostsAndUserDetail}
 // @Failure 500 {object} responses.StatusInternalServerError "服务器错误"
 // @Router /forums/{forum_id}/posts [get]
 func GetAllPostsByForumID(c *gin.Context) {
 	log.Info("get all posts by forum_id controller")
 	forum_id, _ := strconv.Atoi(c.Param("forum_id"))
+	user := service.GetUserFromContext(c)
+	user_id := user.UserId
+	userDetail, err := service.GetOneUserDetail(user_id)
+	if err != nil {
+	    c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "获取用户详情出错", "data": nil})
+	    return
+	}
 
 	data, err := service.GetAllPostDetailsByForumID(forum_id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "查询数据库出现异常" + err.Error(), "data": nil})
 		return
 	}
-
+	ret := PostsAndUserDetail{UserDetail: userDetail, PostDetails: data}
 	c.JSON(http.StatusOK, gin.H{
 		"code": 200,
 		"msg":  fmt.Sprintf("获取论坛 %d 下的全部帖子成功", forum_id),
-		"data": data,
+		"data": ret,
 	})
 }
 

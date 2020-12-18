@@ -21,6 +21,14 @@ definitions:
         items:
           type: integer
         type: array
+  controllers.PostsAndUserDetail:
+    properties:
+      posts:
+        items:
+          $ref: '#/definitions/models.PostDetail'
+        type: array
+      user:
+        $ref: '#/definitions/models.UserDetail'
     type: object
   models.Comment:
     properties:
@@ -179,6 +187,10 @@ definitions:
         type: string
       is_admin:
         type: boolean
+      likeList:
+        items:
+          type: integer
+        type: array
       participate_list:
         items:
           type: integer
@@ -487,9 +499,7 @@ paths:
             - $ref: '#/definitions/responses.StatusOKResponse'
             - properties:
                 data:
-                  items:
-                    $ref: '#/definitions/models.PostDetail'
-                  type: array
+                  $ref: '#/definitions/controllers.PostsAndUserDetail'
               type: object
         "500":
           description: 服务器错误
